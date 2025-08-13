@@ -4,99 +4,224 @@
   <meta charset="UTF-8" />
   <title>Spine – Admin (Daily)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+  a:link {
+    color: rgb(255, 255, 255);
+    background-color: transparent;
+    text-decoration: none;
+  }
+
+  a:visited {
+    color: rgb(255, 255, 255);
+    background-color: transparent;
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: rgb(0, 0, 255);
+    background-color: transparent;
+    text-decoration: underline;
+  }
+
+  a:active {
+    color: rgb(255, 255, 255);
+    background-color: transparent;
+    text-decoration: underline;
+  }
+  </style>
   <script src="https://unpkg.com/@daily-co/daily-js"></script>
-  <!-- <script id="access" type="application/json" src="../../../spine-access.json"></script> -->
   <script type="text/javascript">
     
-    async function readDailyAdminToken() {
-      if (!window.DailyAdminToken) {
-        const fileHandle = await self.showOpenFilePicker({
-          suggestedName: 'spine-access.json',
-          types: [{
-            description: '.json file',
-            accept: {
-              'application/json': ['.json'],
-            },
-          }],
-  //        startIn: 'pictures'
-        });
-        const file = await fileHandle[0].getFile();
-        const textContents = await file.text();
-        var jsonContents = JSON.parse(textContents);
-        console.log(jsonContents);
-        window.DailyAdminToken = jsonContents.dailyAdminToken;
-      }
-      console.log('window.DailyAdminToken = ' + window.DailyAdminToken);
-      document.getElementById("accessBtnId").disabled = jsonContents.dailyAdminToken;
-      return window.DailyAdminToken;
-    }
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const dailyAdminTokenName = 'dailyAdminToken';
+    var dailyAdminToken = urlParams.get(dailyAdminTokenName);
+    var roomsData = null;
+    var roomsPageIndex = 0;
+    var roomsPageCount = 0;
+    var roomsPerPage = 10;
 
-    async function lazyFetchDailyAdminToken() {
-      if (!window.DailyAdminToken)
-        return await readDailyAdminToken();
-      return window.DailyAdminToken;
-    }
+    async function fetchDailyAdminToken() {
 
-    async function listDailyRooms() {
-      var adminToken = await lazyFetchDailyAdminToken();
-      if (adminToken) {
-        // Define the API URL
-        const apiUrl = 'https://api.daily.co/v1/rooms?limit=5';
-        const requestOptions = {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${adminToken}`,
+      // read from local json file
+      const fileHandle = await self.showOpenFilePicker({
+        suggestedName: 'spine-access.json',
+        types: [{
+          description: '.json file',
+          accept: {
+            'application/json': ['.json'],
           },
-        };
+        }],
+      });
+      const file = await fileHandle[0].getFile();
+      const textContents = await file.text();
+      var jsonContents = JSON.parse(textContents);
+      console.log('json: ' + textContents);
+      var token = jsonContents.dailyAdminToken;
+      dailyAdminToken = token;
+      console.log('dailyAdminToken = ' + dailyAdminToken);
 
-        // Make a GET request
-        fetch(apiUrl, requestOptions)
-          .then(response => {
-            if (!response.ok) {
-              throw new Error('Network response was not ok');
-            }
-            return response.json();
-          })
-          .then(data => {
-            console.log(data);
-            var roomsEl = document.getElementById("rooms");
+      // reset url with it as parameter
+      var tokens = window.location.href.split('?');
+      var url = window.location.href;
+      if (1 < tokens.length) {
+        url = tokens[0];
+      }
+      url += '?' + dailyAdminTokenName + '=' + dailyAdminToken;
+      window.location.href = url; // reloads
+    }
 
-            var cols = ["created_at", "name"];//, "id", "url"];           
-            const rowEl = document.createElement('div');
-//            rowEl.classList.add('row');
-            for (index = 0; index < cols.length; index++) {
-              const cell = document.createElement('div');
-//              cell.classList.add('cell');
-              cell.innerHTML = cols[index];
-              rowEl.appendChild(cell);
-            }
-            roomsEl.appendChild(rowEl);
-            roomsEl.appendChild(document.createElement('br'))
 
-            for (index_ = 0; index_ < data.data.length; index_++) {
-              var json_entry = data.data[index_];
-              var rowEl_ = document.createElement('div');
-//              rowEl_.classList.add('row');
-
-              const createdAtEl = document.createElement('div');
-//              createdAtEl.classList.add('cell');
-              createdAtEl.innerHTML = json_entry[cols[0]];
-              rowEl_.appendChild(createdAtEl);
-
-              const nameEl = document.createElement('div');
-              nameEl.innerHTML = json_entry[cols[1]];
-//              nameEl.classList.add('cell');
-              rowEl_.appendChild(nameEl);
-
-              roomsEl.appendChild(rowEl_)
-              roomsEl.appendChild(document.createElement('br'))
-            };
-          })
-          .catch(error => {
-            console.error('Error:', error);
-          });
+    async function initOnLoaded() {
+      await onRoomsDataUpdated(); // cheat call to update state
+      if(dailyAdminToken) {
+        await listDailyRooms(roomsPageCount);
       }
     }
+
+    async function onRoomsDataUpdated() {
+      if (!dailyAdminToken || !roomsData) {
+        document.getElementById("listRoomsBtnId").disabled = true;
+        document.getElementById("roomsPreviousBtnId").disabled = true;
+        document.getElementById("roomsNextBtnId").disabled = true;
+        return ;
+      }
+      roomsPageCount = Math.ceil(roomsData.total_count / roomsPerPage);
+
+      document.getElementById("roomsIndexAndCount").textContent = 'Page ' + (roomsPageIndex + 1) + ' of ' + roomsPageCount + ' pages - ' + roomsData.total_count + " rooms in total.";
+      document.getElementById("listRoomsBtnId").disabled = false;
+      document.getElementById("roomsPreviousBtnId").disabled = !(0 < roomsPageIndex);
+      document.getElementById("roomsNextBtnId").disabled = !(roomsPageIndex + 1 < roomsPageCount);
+    }
+
+    function createTable(header, formats, data) {
+      let table = document.createElement("table");
+      table.border = "1"; // adds visible borders
+
+      let tr = document.createElement("tr");
+      for (let c = 0; c < header.length; c++) {
+        let td = document.createElement("td");
+        let bold = document.createElement("b");
+        let italic = document.createElement("i");        
+        italic.textContent = header[c];
+        bold.appendChild(italic);
+        td.appendChild(bold);
+        td.width = "50%";
+        td.height = "50%";
+        tr.appendChild(td);
+      }
+      table.appendChild(tr);
+
+      for (r = 0; r < data.length; r++) {
+        var json_entry = data[r];
+        let tr = document.createElement("tr");
+        for (let c = 0; c < header.length; c++) {
+          var format = formats[c];
+          if("text" == format) {
+            // name
+            let td = document.createElement("td");
+            td.textContent = json_entry[header[c]]
+            td.width = "50%";
+            td.height = "50%";
+            tr.appendChild(td);
+          }
+          else if ("link_iphone" == format) {
+            let td = document.createElement("td");
+            let url = "./iphone.html?name=" + json_entry[header[c]];
+            let linkEl = document.createElement("a");
+            linkEl.setAttribute("href", url);
+            linkEl.setAttribute("target", "_blank");
+            linkEl.textContent = json_entry[header[c]];
+            td.appendChild(linkEl);
+            td.width = "50%";
+            td.height = "50%";
+            tr.appendChild(td);
+          }
+        }
+        table.appendChild(tr);
+      }
+
+      return table;
+    }
+
+    async function listDailyRooms(previous=false, next=false) {
+      var adminToken = dailyAdminToken;
+      if (!adminToken)
+        return ;
+
+      // Define the API URL
+      var apiBase = 'https://api.daily.co/v1/rooms';
+      var apiParameterLimit = 'limit=' + roomsPerPage;
+      var apiParameterEndingBefore = null;
+      var apiParameterStartingAfter = null;
+      var roomsPageIndexChange = 0;
+      if (roomsData) {
+        if (previous) {
+          if (0 < roomsPageIndex) {
+            var batch_first_entry = roomsData.data[0];
+            https://docs.daily.co/reference/rest-api/rooms/list-rooms#ending_before
+            apiParameterEndingBefore='ending_before=' + batch_first_entry['id'];
+            roomsPageIndexChange--;
+          }
+        }
+
+        if (next) {
+          if (roomsPageIndex + 1 < roomsPageCount ) {
+            var batch_last_entry = roomsData.data[roomsData.data.length-1];
+            https://docs.daily.co/reference/rest-api/rooms/list-rooms#starting_after
+            apiParameterStartingAfter='starting_after=' + batch_last_entry['id'];
+            roomsPageIndexChange++;
+          }
+        }
+      }
+      var apiUrl = apiBase + '?' + apiParameterLimit;
+      if (apiParameterEndingBefore)
+        apiUrl += '&' + apiParameterEndingBefore;
+      if (apiParameterStartingAfter)
+        apiUrl += '&' + apiParameterStartingAfter;
+      console.log('request: ' + apiUrl);
+
+      const requestOptions = {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${adminToken}`,
+        },
+      };
+
+      // Make a GET request
+      fetch(apiUrl, requestOptions)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          roomsData = data;
+          roomsPageIndex += roomsPageIndexChange;
+
+          console.log(data);
+          
+          var roomsEl = document.getElementById("rooms");
+          while(roomsEl.hasChildNodes()) {
+            roomsEl.removeChild(roomsEl.firstChild);
+          }
+
+          var header = ["created_at", "name"];//, "id", "url"];
+          var formats = ["text", "link_iphone"];          
+          var tableEl = createTable(header, formats, data.data);
+          
+          roomsEl.appendChild(tableEl);
+
+          (async () => {
+            await onRoomsDataUpdated();
+          })();
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    }
+
   </script>
   <style>
     body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;padding:16px;background:#0b0f14;color:#e6edf3}
@@ -116,27 +241,21 @@
 </head>
 <body>
 <div id="app">
-  <div id="status">Forbinder…</div>
+  <div id="status"></div>
   <div class="row">
-    <button id="accessBtnId" onclick="readDailyAdminToken()">Read Daily Admin Token</button>
-    <button id="listRoomsBtnId" onclick="listDailyRooms()">List Daily Rooms</button>
+    <button id="accessBtnId" onclick="fetchDailyAdminToken()">Fetch Daily Admin Token</button>
+    <button id="listRoomsBtnId" onclick="listDailyRooms()" hidden=true>List Daily Rooms</button>
   </div>
   <h3>Rooms</h3>
+  <div id="roomsIndexAndCount"></div>
+  <br>
   <div id="rooms"></div>
-
-<!--  
+  <br>
   <div class="row">
-    <button id="testBtn" disabled>Send test-besked</button>
-    <button id="enableAudioBtn" disabled>Aktivér lyd</button>
+    <button id="roomsPreviousBtnId" onclick="listDailyRooms(true, false)">Previous</button>
+    <button id="roomsNextBtnId" onclick="listDailyRooms(false, true)">Next</button>
   </div>
-  <div class="hint">Tip: Klik “Aktivér lyd”, hvis du ikke hører noget. Video bør vise uden klik.</div>
 
-  <h3>Remote streams</h3>
-  <div id="remoteGrid" class="grid"></div>
-
-  <h3>Lokalt (valgfrit)</h3>
-  <div id="localGrid" class="grid"></div>
--->  
 </div>
 
 <script>
@@ -146,12 +265,7 @@
   });
 
   const statusEl = document.getElementById('status');
-/*
-  const testBtn = document.getElementById('testBtn');
-  const enableAudioBtn = document.getElementById('enableAudioBtn');
-  const remoteGrid = document.getElementById('remoteGrid');
-  const localGrid  = document.getElementById('localGrid');
-*/
+
   let isJoined = false;
 
   function updateStatus(msg) {
@@ -159,261 +273,15 @@
     console.log('[status]', msg);
   }
 
-  /*
-  // --- UI helpers ---
-  function ensureRemoteTile(participant) {
-    const pid = participant.session_id;
-    let tile = remoteGrid.querySelector(`.tile[data-pid="${pid}"]`);
-    if (!tile) {
-      tile = document.createElement('div');
-      tile.className = 'tile';
-      tile.dataset.pid = pid;
-      tile.innerHTML = `
-        <header>
-          <span>${participant.user_name || 'Deltager'} <span class="pill">id: ${pid.slice(0,6)}</span></span>
-          <span id="trackBadges-${pid}" class="pill">venter på spor…</span>
-        </header>
-        <div class="media"></div>
-      `;
-      remoteGrid.appendChild(tile);
-    }
-    return tile;
-  }
-
-  function ensureLocalTile() {
-    let tile = localGrid.querySelector(`.tile[data-pid="me"]`);
-    if (!tile) {
-      tile = document.createElement('div');
-      tile.className = 'tile local';
-      tile.dataset.pid = 'me';
-      tile.innerHTML = `
-        <header>
-          <span>Browser-klient (local)</span>
-          <span class="pill">receive-only</span>
-        </header>
-        <div class="media"></div>
-      `;
-      localGrid.appendChild(tile);
-    }
-    return tile;
-  }
-
-  function setBadges(pid, kinds) {
-    const el = document.getElementById(`trackBadges-${pid}`);
-    if (!el) return;
-    if (!kinds || kinds.size === 0) el.textContent = 'ingen spor';
-    else el.textContent = Array.from(kinds).join(' + ');
-  }
-
-  function keyToKind(k) {
-    // Map Daily track keys to media element kind
-    // 'video' | 'screenVideo' -> 'video', 'audio' | 'screenAudio' -> 'audio'
-    return (k === 'video' || k === 'screenVideo') ? 'video' : 'audio';
-  }
-
-  // Attach a MediaStreamTrack to a media element (video/audio)
-  function attachTrack({ participant, track, kind, isLocal = false, labelSuffix = '' }) {
-    const pid = participant?.session_id || (isLocal ? 'me' : 'unknown');
-    const tile = isLocal ? ensureLocalTile() : ensureRemoteTile(participant);
-    const mediaWrap = tile.querySelector('.media');
-
-    const elId = `${isLocal ? 'local' : 'remote'}-${pid}-${kind}${labelSuffix}`;
-    let el = mediaWrap.querySelector(`#${CSS.escape(elId)}`);
-
-    if (!el) {
-      if (kind === 'video') {
-        el = document.createElement('video');
-        el.setAttribute('playsinline', 'playsinline');
-        el.autoplay = true;
-        el.muted = isLocal; // local preview muted
-        el.id = elId;
-        mediaWrap.appendChild(el);
-      } else if (kind === 'audio') {
-        el = document.createElement('audio');
-        el.autoplay = true;
-        el.id = elId;
-        mediaWrap.appendChild(el);
-      }
-    }
-
-    const ms = el.srcObject instanceof MediaStream ? el.srcObject : new MediaStream();
-    // Fjern tidligere track af samme kind
-    ms.getTracks().filter(t => t.kind === kind).forEach(t => ms.removeTrack(t));
-    if (track) ms.addTrack(track);
-    el.srcObject = ms;
-
-    // Forsøg at afspille (audio kan kræve klik)
-    el.play().catch(() => {});
-
-    // Badges
-    const kinds = new Set(ms.getTracks().map(t => t.kind));
-    setBadges(pid, kinds);
-  }
-
-  function detachTrack({ participant, kind, isLocal = false }) {
-    const pid = participant?.session_id || (isLocal ? 'me' : 'unknown');
-    const container = isLocal ? localGrid : remoteGrid;
-    const sel = `${isLocal ? 'local' : 'remote'}-${pid}-${kind}`;
-    // Kan være flere (fx video + screenVideo deler 'video' kind). Fjern alle matching.
-    container.querySelectorAll(`[id^="${sel}"]`).forEach(el => {
-      if (el.srcObject) {
-        const ms = el.srcObject;
-        ms.getTracks().forEach(t => { if (t.kind === kind) ms.removeTrack(t); });
-        if (ms.getTracks().length === 0) el.srcObject = null;
-        const kinds = new Set(ms.getTracks().map(t => t.kind));
-        setBadges(pid, kinds);
-      }
-    });
-  }
-
-  // Eksplicit subscription (hjælper især mod iOS-klienter)
-  function subscribeToParticipant(pid) {
-    try {
-      callFrame.updateParticipant(pid, {
-        setSubscribedTracks: { video: true, audio: true, screenVideo: true, screenAudio: true }
-      });
-    } catch (e) {
-      console.warn('updateParticipant failed', e);
-    }
-  }
-
-  // --- Daily events ---
-  callFrame.on('joined-meeting', () => {
-    isJoined = true;
-    updateStatus('Forbundet til rummet');
-    testBtn.disabled = false;
-    enableAudioBtn.disabled = false;
-
-    // Tving subscription til alle nuværende deltagere (ikke mig selv)
-    const participants = callFrame.participants();
-    Object.values(participants).forEach(p => {
-      if (!p.local) subscribeToParticipant(p.session_id);
-    });
-
-    // Mount eksisterende playable spor (brug persistentTrack)
-    Object.values(participants).forEach(p => {
-      ['video','audio','screenVideo','screenAudio'].forEach(k => {
-        const info = p.tracks?.[k];
-        const mtrack = info?.persistentTrack || info?.track;
-        if (info && info.state === 'playable' && mtrack) {
-          attachTrack({
-            participant: p,
-            track: mtrack,
-            kind: keyToKind(k),
-            labelSuffix: k.startsWith('screen') ? '-screen' : ''
-          });
-        }
-      });
-    });
-  });
-  callFrame.on('left-meeting', () => {
-    isJoined = false;
-    updateStatus('Afbrudt');
-    testBtn.disabled = true;
-    enableAudioBtn.disabled = true;
-    remoteGrid.innerHTML = '';
-    localGrid.innerHTML = '';
-  });
-*/
-
   callFrame.on('error', (e) => updateStatus(`Fejl: ${e?.errorMsg || e?.message || e}`));
-/*
-  callFrame.on('participant-joined', (ev) => {
-    ensureRemoteTile(ev.participant);
-    subscribeToParticipant(ev.participant.session_id);
-  });
 
-  callFrame.on('participant-updated', (ev) => {
-    const p = ev.participant;
-    // Hvis spor bliver playable efterfølgende, montér dem (persistentTrack fallback)
-    ['video','audio','screenVideo','screenAudio'].forEach(k => {
-      const info = p.tracks?.[k];
-      const mtrack = info?.persistentTrack || info?.track;
-      if (info && info.state === 'playable' && mtrack) {
-        attachTrack({
-          participant: p,
-          track: mtrack,
-          kind: keyToKind(k),
-          labelSuffix: k.startsWith('screen') ? '-screen' : ''
-        });
-      }
-    });
-  });
+  window.onload = (event) => {
+    console.log("page is fully loaded");
+    (async () => {
+      await initOnLoaded();
+    })();
+  };
 
-  // Brug track-started/track-stopped til at håndtere ændringer live
-  callFrame.on('track-started', (ev) => {
-    const { participant, kind } = ev;
-    const pid = participant?.session_id || ev.participant?.session_id;
-    const p = participant || callFrame.participants()[pid];
-    // Slå korrekt track op og brug persistentTrack fallback
-    const key = (ev.kind === 'video' || ev.track?.kind === 'video') ? 'video' : 'audio';
-    const info = p?.tracks?.[key] || p?.tracks?.[(key === 'video') ? 'screenVideo' : 'screenAudio'];
-    const mtrack = ev.track || info?.persistentTrack || info?.track;
-    if (p && mtrack) {
-      attachTrack({
-        participant: p,
-        track: mtrack,
-        kind,
-        labelSuffix: (info && (info === p?.tracks?.screenVideo || info === p?.tracks?.screenAudio)) ? '-screen' : ''
-      });
-    }
-  });
-
-  callFrame.on('track-stopped', (ev) => {
-    const { participant, kind } = ev;
-    detachTrack({ participant, kind });
-  });
-
-  callFrame.on('participant-left', (ev) => {
-    const pid = ev.participant.session_id;
-    const tile = remoteGrid.querySelector(`.tile[data-pid="${pid}"]`);
-    if (tile) tile.remove();
-  });
-
-  // --- Buttons ---
-  testBtn.addEventListener('click', () => {
-    if (!isJoined) return updateStatus('Ikke forbundet');
-    try {
-      callFrame.sendAppMessage({
-        date: new Date().toISOString(),
-        message: 'Hello from browser!',
-      }, '*');
-      updateStatus('Sendt: Hello from browser!');
-    } catch (err) {
-      updateStatus(`Fejl: ${err.message}`);
-    }
-  });
-
-  enableAudioBtn.addEventListener('click', async () => {
-    // Forsøg at afspille alle audio/video elementer (til at “unmute” autoplay-restriktion)
-    const mediaEls = remoteGrid.querySelectorAll('audio, video');
-    let ok = 0, fail = 0;
-    await Promise.all(Array.from(mediaEls).map(async el => {
-      el.muted = false; // prøv at fjerne mute for remote
-      try { await el.play(); ok++; } catch { fail++; }
-    }));
-    updateStatus(`Lyd aktiveret (afspiller: ${ok}, afvist: ${fail})`);
-  });
-
-
-  // --- Join rummet (receive-only) ---
-  callFrame.join({
-    url: "https://veo-labs.daily.co/spine",
-    userName: "Browser Client",
-    // Browseren sender ikke sit eget kamera/mikrofon; kun modtager
-    videoSource: false,
-    audioSource: false
-  }).catch(err => updateStatus(`Join fejlede: ${err.message}`));
-
-  // Forlad pænt
-  window.addEventListener('beforeunload', () => { try { callFrame.leave(); } catch {} });
-*/
-/*
-callFrame.preAuth({
-  //url: 'DAILY_ROOM_URL',
-  token: '${window.DailyAdminToken}'
-});
-*/
 </script>
 </body>
 </html>
