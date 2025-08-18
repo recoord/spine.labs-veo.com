@@ -5,71 +5,52 @@
   <title>Spine – Admin (Daily)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-  a:link {
-    color: rgb(255, 255, 255);
-    background-color: transparent;
-    text-decoration: none;
-  }
-
-  a:visited {
-    color: rgb(255, 255, 255);
-    background-color: transparent;
-    text-decoration: none;
-  }
-
-  a:hover {
-    color: rgb(0, 0, 255);
-    background-color: transparent;
-    text-decoration: underline;
-  }
-
-  a:active {
-    color: rgb(255, 255, 255);
-    background-color: transparent;
-    text-decoration: underline;
-  }
+    a:link,a:visited,a:active{color:#fff;background:transparent;text-decoration:none}
+    a:hover{color:#00f;background:transparent;text-decoration:underline}
   </style>
   <script src="https://unpkg.com/@daily-co/daily-js"></script>
   <script type="text/javascript">
-    
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString);
     const dailyAdminTokenName = 'dailyAdminToken';
-    var dailyAdminToken = urlParams.get(dailyAdminTokenName);
-    var roomsData = null;
-    var roomsPageIndex = 0;
-    var roomsPageCount = 0;
-    var roomsPerPage = 10;
+    let dailyAdminToken = localStorage.getItem(dailyAdminTokenName) || null;
+    let roomsData = null;
+    let roomsPageIndex = 0;
+    let roomsPageCount = 0;
+    const roomsPerPage = 10;
 
-	async function fetchDailyAdminToken() {
-	  const input = document.createElement('input');
-	  input.type = 'file';
-	  input.accept = 'application/json,.json';
-	  input.style.display = 'none';
-	  document.body.appendChild(input);
+    // --- Hent token fra json-fil og gem i localStorage ---
+    async function fetchDailyAdminToken() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'application/json,.json';
+      input.style.display = 'none';
+      document.body.appendChild(input);
 
-	  input.onchange = async (e) => {
-	    const file = e.target.files && e.target.files[0];
-	    if (!file) { document.body.removeChild(input); return; }
-	    const text = await file.text();
+      input.onchange = async (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) { document.body.removeChild(input); return; }
+        const text = await file.text();
 
-	    let token = '';
-	    try { token = (JSON.parse(text).dailyAdminToken || '').trim(); }
-	    catch { token = (text || '').trim(); }
+        let token = '';
+        try { token = (JSON.parse(text).dailyAdminToken || '').trim(); }
+        catch { token = (text || '').trim(); }
 
-	    if (!token) { alert('Parsing "dailyAdminToken" failed.'); document.body.removeChild(input); return; }
+        if (!token) { 
+          alert('Parsing "dailyAdminToken" failed.'); 
+          document.body.removeChild(input); 
+          return; 
+        }
 
-	    dailyAdminToken = token;
-	    var tokens = window.location.href.split('?');
-	    var url = tokens[0] + '?' + dailyAdminTokenName + '=' + encodeURIComponent(dailyAdminToken);
-	    window.location.href = url; // reloads
-	  };
+        localStorage.setItem(dailyAdminTokenName, token);
+        dailyAdminToken = token;
 
-	  input.click();
-	}
+        window.location.reload(); // reload uden query param
+      };
+
+      input.click();
+    }
 
     async function initOnLoaded() {
-      await onRoomsDataUpdated(); // cheat call to update state
+      await onRoomsDataUpdated();
       if(dailyAdminToken) {
         await listDailyRooms(roomsPageCount);
       }
@@ -83,8 +64,9 @@
         return ;
       }
       roomsPageCount = Math.ceil(roomsData.total_count / roomsPerPage);
-
-      document.getElementById("roomsIndexAndCount").textContent = 'Page ' + (roomsPageIndex + 1) + ' of ' + roomsPageCount + ' pages - ' + roomsData.total_count + " rooms in total.";
+      document.getElementById("roomsIndexAndCount").textContent =
+        'Page ' + (roomsPageIndex + 1) + ' of ' + roomsPageCount + 
+        ' pages - ' + roomsData.total_count + " rooms in total.";
       document.getElementById("listRoomsBtnId").disabled = false;
       document.getElementById("roomsPreviousBtnId").disabled = !(0 < roomsPageIndex);
       document.getElementById("roomsNextBtnId").disabled = !(roomsPageIndex + 1 < roomsPageCount);
@@ -92,7 +74,7 @@
 
     function createTable(header, formats, data) {
       let table = document.createElement("table");
-      table.border = "1"; // adds visible borders
+      table.border = "1";
 
       let tr = document.createElement("tr");
       for (let c = 0; c < header.length; c++) {
@@ -108,17 +90,14 @@
       }
       table.appendChild(tr);
 
-      for (r = 0; r < data.length; r++) {
+      for (let r = 0; r < data.length; r++) {
         var json_entry = data[r];
         let tr = document.createElement("tr");
         for (let c = 0; c < header.length; c++) {
           var format = formats[c];
           if("text" == format) {
-            // name
             let td = document.createElement("td");
             td.textContent = json_entry[header[c]]
-            td.width = "50%";
-            td.height = "50%";
             tr.appendChild(td);
           }
           else if ("link_iphone" == format) {
@@ -129,45 +108,34 @@
             linkEl.setAttribute("target", "_blank");
             linkEl.textContent = json_entry[header[c]];
             td.appendChild(linkEl);
-            td.width = "50%";
-            td.height = "50%";
             tr.appendChild(td);
           }
         }
         table.appendChild(tr);
       }
-
       return table;
     }
 
     async function listDailyRooms(previous=false, next=false) {
-      var adminToken = dailyAdminToken;
-      if (!adminToken)
-        return ;
+      if (!dailyAdminToken) return;
 
-      // Define the API URL
       var apiBase = 'https://api.daily.co/v1/rooms';
       var apiParameterLimit = 'limit=' + roomsPerPage;
       var apiParameterEndingBefore = null;
       var apiParameterStartingAfter = null;
       var roomsPageIndexChange = 0;
       if (roomsData) {
-        if (previous) {
-          if (0 < roomsPageIndex) {
-            var batch_first_entry = roomsData.data[0];
-            https://docs.daily.co/reference/rest-api/rooms/list-rooms#ending_before
-            apiParameterEndingBefore='ending_before=' + batch_first_entry['id'];
-            roomsPageIndexChange--;
-          }
+        if (previous && roomsPageIndex > 0) {
+          var batch_first_entry = roomsData.data[0];
+          // https://docs.daily.co/reference/rest-api/rooms/list-rooms#ending_before
+          apiParameterEndingBefore='ending_before=' + batch_first_entry['id'];
+          roomsPageIndexChange--;
         }
-
-        if (next) {
-          if (roomsPageIndex + 1 < roomsPageCount ) {
-            var batch_last_entry = roomsData.data[roomsData.data.length-1];
-            https://docs.daily.co/reference/rest-api/rooms/list-rooms#starting_after
-            apiParameterStartingAfter='starting_after=' + batch_last_entry['id'];
-            roomsPageIndexChange++;
-          }
+        if (next && roomsPageIndex + 1 < roomsPageCount) {
+          var batch_last_entry = roomsData.data[roomsData.data.length-1];
+          // https://docs.daily.co/reference/rest-api/rooms/list-rooms#starting_after
+          apiParameterStartingAfter='starting_after=' + batch_last_entry['id'];
+          roomsPageIndexChange++;
         }
       }
       var apiUrl = apiBase + '?' + apiParameterLimit;
@@ -179,45 +147,32 @@
 
       const requestOptions = {
         method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${adminToken}`,
-        },
+        headers: { 'Authorization': `Bearer ${dailyAdminToken}` },
       };
 
-      // Make a GET request
       fetch(apiUrl, requestOptions)
         .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
+          if (!response.ok) throw new Error('Network response was not ok');
           return response.json();
         })
         .then(data => {
           roomsData = data;
           roomsPageIndex += roomsPageIndexChange;
 
-          console.log(data);
-          
           var roomsEl = document.getElementById("rooms");
-          while(roomsEl.hasChildNodes()) {
-            roomsEl.removeChild(roomsEl.firstChild);
-          }
+          while(roomsEl.hasChildNodes()) roomsEl.removeChild(roomsEl.firstChild);
 
-          var header = ["created_at", "name"];//, "id", "url"];
+          var header = ["created_at", "name"];
           var formats = ["text", "link_iphone"];          
           var tableEl = createTable(header, formats, data.data);
-          
           roomsEl.appendChild(tableEl);
 
-          (async () => {
-            await onRoomsDataUpdated();
-          })();
+          (async () => { await onRoomsDataUpdated(); })();
         })
         .catch(error => {
           console.error('Error:', error);
         });
     }
-
   </script>
   <style>
     body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;padding:16px;background:#0b0f14;color:#e6edf3}
@@ -239,8 +194,8 @@
 <div id="app">
   <div id="status"></div>
   <div class="row">
-    <button id="accessBtnId" onclick="fetchDailyAdminToken()">Fetch Daily Admin Token</button>
-    <button id="listRoomsBtnId" onclick="listDailyRooms()" hidden=true>List Daily Rooms</button>
+    <button id="accessBtnId" onclick="fetchDailyAdminToken()">Load / Update Daily Admin Token</button>
+    <button id="listRoomsBtnId" onclick="listDailyRooms()">List Daily Rooms</button>
   </div>
   <h3>Rooms</h3>
   <div id="roomsIndexAndCount"></div>
@@ -251,18 +206,11 @@
     <button id="roomsPreviousBtnId" onclick="listDailyRooms(true, false)">Previous</button>
     <button id="roomsNextBtnId" onclick="listDailyRooms(false, true)">Next</button>
   </div>
-
 </div>
 
 <script>
-  // --- Daily setup (receive-only browser viewer) ---
-  const callFrame = Daily.createCallObject({
-    //subscribeToTracksAutomatically: true
-  });
-
+  const callFrame = Daily.createCallObject({});
   const statusEl = document.getElementById('status');
-
-  let isJoined = false;
 
   function updateStatus(msg) {
     statusEl.textContent = msg;
@@ -271,13 +219,10 @@
 
   callFrame.on('error', (e) => updateStatus(`Fejl: ${e?.errorMsg || e?.message || e}`));
 
-  window.onload = (event) => {
+  window.onload = () => {
     console.log("page is fully loaded");
-    (async () => {
-      await initOnLoaded();
-    })();
+    (async () => { await initOnLoaded(); })();
   };
-
 </script>
 </body>
 </html>
