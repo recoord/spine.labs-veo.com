@@ -2,48 +2,144 @@
 <html lang="da">
 <head>
   <meta charset="UTF-8" />
-  <title>Daily Room Viewer</title>
+  <title>Daily Room Viewer – 16:9 uden beskæring</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://unpkg.com/@daily-co/daily-js"></script>
   <style>
     html,body{margin:0;height:100%;background:#000;color:#fff;font-family:sans-serif}
-    #status{position:absolute;top:10px;left:10px;background:rgba(0,0,0,.6);padding:6px 10px;border-radius:6px;font-size:14px;z-index:10}
-    #video-container{width:100%;height:100%}
-    iframe{width:100%;height:100%;border:0}
+    #status{
+      position:absolute;top:10px;left:10px;background:rgba(0,0,0,.6);
+      padding:6px 10px;border-radius:6px;font-size:14px;z-index:10
+    }
+    #video-container{
+      display:flex;flex-wrap:wrap;gap:1rem;box-sizing:border-box;padding:1rem;
+      align-items:flex-start; /* undgå at børn strækkes i højden */
+    }
+    .video-wrap{
+      flex:1 1 48%;max-width:48%;
+      aspect-ratio:16/9;            /* Lås rammen til 16:9 */
+      position:relative;background:#000;border-radius:.5rem
+    }
+    @media (max-width: 900px){
+      .video-wrap{flex-basis:100%;max-width:100%}
+    }
+    video{
+      width:100%;height:100%;
+      object-fit:contain;           /* Vis hele billedet – aldrig crop */
+      object-position:center;
+      border:0;border-radius:.5rem;background:#000
+    }
+    .placeholder{
+      position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+      color:#aaa;font-size:14px;pointer-events:none
+    }
+    .hidden{display:none}
   </style>
 </head>
 <body>
   <div id="status">Connecting…</div>
-  <div id="video-container"></div>
+
+  <div id="video-container">
+    <div class="video-wrap">
+      <video id="vWide"  playsinline autoplay muted></video>
+      <div id="phWide"  class="placeholder">Ingen wide video</div>
+    </div>
+    <div class="video-wrap">
+      <video id="vUltra" playsinline autoplay muted></video>
+      <div id="phUltra" class="placeholder">Ingen ultra-wide video</div>
+    </div>
+  </div>
+
   <script>
-    const params = new URLSearchParams(window.location.search);
+    const params   = new URLSearchParams(window.location.search);
     const roomName = params.get("name");
     const statusEl = document.getElementById("status");
+    const vWide    = document.getElementById("vWide");
+    const vUltra   = document.getElementById("vUltra");
+    const phWide   = document.getElementById("phWide");
+    const phUltra  = document.getElementById("phUltra");
 
     if (!roomName) {
       statusEl.textContent = "Error: no room name (?name=…)";
       throw new Error("Missing ?name param");
     }
-
     const roomUrl = `https://veo-labs.daily.co/${encodeURIComponent(roomName)}`;
 
-    const callFrame = Daily.createFrame(document.getElementById("video-container"), {
-      iframeStyle: { width: "100%", height: "100%", border: "0" },
-      showLeaveButton: false,
+    // Minimal call-objekt (ingen iframe)
+    const call = window.DailyIframe.createCallObject({
       subscribeToTracksAutomatically: true
     });
 
-    callFrame
-      .on("joining-meeting", () => statusEl.textContent = "Joining room…")
-      .on("joined-meeting", ()  => statusEl.textContent = "Connected ✓")
-      .on("left-meeting", ()    => statusEl.textContent = "Disconnected")
-      .on("error", e => statusEl.textContent = "Error: " + (e?.errorMsg || e?.message || e));
+    const attached = { vWide: null, vUltra: null };
 
-    // Viewer-only: start with mic/cam OFF (no permission prompt)
-    callFrame.join({
+    function attachTrack(el, placeholder, mediaTrack) {
+      if (!mediaTrack) return;
+      if (attached[el.id] === mediaTrack.id) return;
+      attached[el.id] = mediaTrack.id;
+      el.srcObject = new MediaStream([mediaTrack]);
+      placeholder.classList.add("hidden");
+      const tryPlay = () => el.play().catch(()=>{});
+      if (el.readyState >= 1) tryPlay(); else el.onloadedmetadata = tryPlay;
+    }
+
+    function detach(el, placeholder) {
+      el.srcObject = null;
+      attached[el.id] = null;
+      placeholder.classList.remove("hidden");
+    }
+    function detachAll() {
+      detach(vWide, phWide);
+      detach(vUltra, phUltra);
+    }
+
+    // Vis wide/ultra fra første remote, der har disse spor
+    let targetSessionId = null;
+
+    function maybeAttachFor(p) {
+      if (!p || p.local) return;
+
+      if (!targetSessionId && (p.tracks?.wide || p.tracks?.ultraWide)) {
+        targetSessionId = p.session_id;
+      }
+      if (p.session_id !== targetSessionId) return;
+
+      const wide  = p.tracks?.wide;
+      const ultra = p.tracks?.ultraWide;
+
+      const wideTrack  = wide?.persistentTrack  || wide?.track;
+      const ultraTrack = ultra?.persistentTrack || ultra?.track;
+
+      if (wide?.state === "playable" && wideTrack)  attachTrack(vWide,  phWide,  wideTrack);
+      else detach(vWide, phWide);
+
+      if (ultra?.state === "playable" && ultraTrack) attachTrack(vUltra, phUltra, ultraTrack);
+      else detach(vUltra, phUltra);
+    }
+
+    call
+      .on("joining-meeting", () => statusEl.textContent = "Joining room…")
+      .on("joined-meeting",  () => statusEl.textContent = "Connected ✓")
+      .on("left-meeting",    () => { statusEl.textContent = "Disconnected"; detachAll(); })
+      .on("error", e => statusEl.textContent = "Error: " + (e?.errorMsg || e?.message || e))
+      .on("participant-joined",  ev => maybeAttachFor(ev.participant))
+      .on("participant-updated", ev => maybeAttachFor(ev.participant))
+      .on("participant-left",    ev => {
+        if (ev?.participant?.session_id === targetSessionId) {
+          targetSessionId = null;
+          detachAll();
+        }
+      });
+
+    call.join({
       url: roomUrl,
       startAudioOff: true,
       startVideoOff: true
+    }).then(() => {
+      // Håndter deltagere der allerede er i rummet
+      const parts = call.participants();
+      Object.values(parts).forEach(p => maybeAttachFor(p));
+    }).catch(err => {
+      statusEl.textContent = "Error: " + (err?.errorMsg || err?.message || err);
     });
   </script>
 </body>
