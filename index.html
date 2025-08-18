@@ -1,13 +1,287 @@
-<!-- index.html -->
-<!doctype html>
+<!DOCTYPE html>
 <html lang="da">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>SPINE</title>
-  </head>
-  <body>
-    <h1>spine.labs-veo.com</h1>
-    <p>🚀</p>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <title>Spine – Admin (Daily)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+  a:link {
+    color: rgb(255, 255, 255);
+    background-color: transparent;
+    text-decoration: none;
+  }
+
+  a:visited {
+    color: rgb(255, 255, 255);
+    background-color: transparent;
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: rgb(0, 0, 255);
+    background-color: transparent;
+    text-decoration: underline;
+  }
+
+  a:active {
+    color: rgb(255, 255, 255);
+    background-color: transparent;
+    text-decoration: underline;
+  }
+  </style>
+  <script src="https://unpkg.com/@daily-co/daily-js"></script>
+  <script type="text/javascript">
+    
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const dailyAdminTokenName = 'dailyAdminToken';
+    var dailyAdminToken = urlParams.get(dailyAdminTokenName);
+    var roomsData = null;
+    var roomsPageIndex = 0;
+    var roomsPageCount = 0;
+    var roomsPerPage = 10;
+
+    async function fetchDailyAdminToken() {
+
+      // read from local json file
+      const fileHandle = await self.showOpenFilePicker({
+        suggestedName: 'spine-access.json',
+        types: [{
+          description: '.json file',
+          accept: {
+            'application/json': ['.json'],
+          },
+        }],
+      });
+      const file = await fileHandle[0].getFile();
+      const textContents = await file.text();
+      var jsonContents = JSON.parse(textContents);
+      console.log('json: ' + textContents);
+      var token = jsonContents.dailyAdminToken;
+      dailyAdminToken = token;
+      console.log('dailyAdminToken = ' + dailyAdminToken);
+
+      // reset url with it as parameter
+      var tokens = window.location.href.split('?');
+      var url = window.location.href;
+      if (1 < tokens.length) {
+        url = tokens[0];
+      }
+      url += '?' + dailyAdminTokenName + '=' + dailyAdminToken;
+      window.location.href = url; // reloads
+    }
+
+
+    async function initOnLoaded() {
+      await onRoomsDataUpdated(); // cheat call to update state
+      if(dailyAdminToken) {
+        await listDailyRooms(roomsPageCount);
+      }
+    }
+
+    async function onRoomsDataUpdated() {
+      if (!dailyAdminToken || !roomsData) {
+        document.getElementById("listRoomsBtnId").disabled = true;
+        document.getElementById("roomsPreviousBtnId").disabled = true;
+        document.getElementById("roomsNextBtnId").disabled = true;
+        return ;
+      }
+      roomsPageCount = Math.ceil(roomsData.total_count / roomsPerPage);
+
+      document.getElementById("roomsIndexAndCount").textContent = 'Page ' + (roomsPageIndex + 1) + ' of ' + roomsPageCount + ' pages - ' + roomsData.total_count + " rooms in total.";
+      document.getElementById("listRoomsBtnId").disabled = false;
+      document.getElementById("roomsPreviousBtnId").disabled = !(0 < roomsPageIndex);
+      document.getElementById("roomsNextBtnId").disabled = !(roomsPageIndex + 1 < roomsPageCount);
+    }
+
+    function createTable(header, formats, data) {
+      let table = document.createElement("table");
+      table.border = "1"; // adds visible borders
+
+      let tr = document.createElement("tr");
+      for (let c = 0; c < header.length; c++) {
+        let td = document.createElement("td");
+        let bold = document.createElement("b");
+        let italic = document.createElement("i");        
+        italic.textContent = header[c];
+        bold.appendChild(italic);
+        td.appendChild(bold);
+        td.width = "50%";
+        td.height = "50%";
+        tr.appendChild(td);
+      }
+      table.appendChild(tr);
+
+      for (r = 0; r < data.length; r++) {
+        var json_entry = data[r];
+        let tr = document.createElement("tr");
+        for (let c = 0; c < header.length; c++) {
+          var format = formats[c];
+          if("text" == format) {
+            // name
+            let td = document.createElement("td");
+            td.textContent = json_entry[header[c]]
+            td.width = "50%";
+            td.height = "50%";
+            tr.appendChild(td);
+          }
+          else if ("link_iphone" == format) {
+            let td = document.createElement("td");
+            let url = "./iphone.html?name=" + json_entry[header[c]];
+            let linkEl = document.createElement("a");
+            linkEl.setAttribute("href", url);
+            linkEl.setAttribute("target", "_blank");
+            linkEl.textContent = json_entry[header[c]];
+            td.appendChild(linkEl);
+            td.width = "50%";
+            td.height = "50%";
+            tr.appendChild(td);
+          }
+        }
+        table.appendChild(tr);
+      }
+
+      return table;
+    }
+
+    async function listDailyRooms(previous=false, next=false) {
+      var adminToken = dailyAdminToken;
+      if (!adminToken)
+        return ;
+
+      // Define the API URL
+      var apiBase = 'https://api.daily.co/v1/rooms';
+      var apiParameterLimit = 'limit=' + roomsPerPage;
+      var apiParameterEndingBefore = null;
+      var apiParameterStartingAfter = null;
+      var roomsPageIndexChange = 0;
+      if (roomsData) {
+        if (previous) {
+          if (0 < roomsPageIndex) {
+            var batch_first_entry = roomsData.data[0];
+            https://docs.daily.co/reference/rest-api/rooms/list-rooms#ending_before
+            apiParameterEndingBefore='ending_before=' + batch_first_entry['id'];
+            roomsPageIndexChange--;
+          }
+        }
+
+        if (next) {
+          if (roomsPageIndex + 1 < roomsPageCount ) {
+            var batch_last_entry = roomsData.data[roomsData.data.length-1];
+            https://docs.daily.co/reference/rest-api/rooms/list-rooms#starting_after
+            apiParameterStartingAfter='starting_after=' + batch_last_entry['id'];
+            roomsPageIndexChange++;
+          }
+        }
+      }
+      var apiUrl = apiBase + '?' + apiParameterLimit;
+      if (apiParameterEndingBefore)
+        apiUrl += '&' + apiParameterEndingBefore;
+      if (apiParameterStartingAfter)
+        apiUrl += '&' + apiParameterStartingAfter;
+      console.log('request: ' + apiUrl);
+
+      const requestOptions = {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${adminToken}`,
+        },
+      };
+
+      // Make a GET request
+      fetch(apiUrl, requestOptions)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          roomsData = data;
+          roomsPageIndex += roomsPageIndexChange;
+
+          console.log(data);
+          
+          var roomsEl = document.getElementById("rooms");
+          while(roomsEl.hasChildNodes()) {
+            roomsEl.removeChild(roomsEl.firstChild);
+          }
+
+          var header = ["created_at", "name"];//, "id", "url"];
+          var formats = ["text", "link_iphone"];          
+          var tableEl = createTable(header, formats, data.data);
+          
+          roomsEl.appendChild(tableEl);
+
+          (async () => {
+            await onRoomsDataUpdated();
+          })();
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    }
+
+  </script>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;padding:16px;background:#0b0f14;color:#e6edf3}
+    #app{max-width:1100px;margin:0 auto}
+    #status{margin-bottom:12px;opacity:.9}
+    .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    button{background:#1f6feb;color:white;border:0;border-radius:10px;padding:10px 14px;font-weight:600;cursor:pointer}
+    button[disabled]{opacity:.5;cursor:not-allowed}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-top:14px}
+    .tile{position:relative;background:#0d1117;border:1px solid #30363d;border-radius:14px;overflow:hidden}
+    .tile header{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-bottom:1px solid #30363d;font-size:13px;background:#0b1220}
+    video, audio{width:100%;display:block;background:black}
+    .hint{font-size:12px;opacity:.8;margin-top:6px}
+    .local{outline:2px dashed #30363d}
+    .pill{font-size:10px;padding:2px 6px;border-radius:999px;background:#13233a;border:1px solid #2b3f5f}
+  </style>
+</head>
+<body>
+<div id="app">
+  <div id="status"></div>
+  <div class="row">
+    <button id="accessBtnId" onclick="fetchDailyAdminToken()">Fetch Daily Admin Token</button>
+    <button id="listRoomsBtnId" onclick="listDailyRooms()" hidden=true>List Daily Rooms</button>
+  </div>
+  <h3>Rooms</h3>
+  <div id="roomsIndexAndCount"></div>
+  <br>
+  <div id="rooms"></div>
+  <br>
+  <div class="row">
+    <button id="roomsPreviousBtnId" onclick="listDailyRooms(true, false)">Previous</button>
+    <button id="roomsNextBtnId" onclick="listDailyRooms(false, true)">Next</button>
+  </div>
+
+</div>
+
+<script>
+  // --- Daily setup (receive-only browser viewer) ---
+  const callFrame = Daily.createCallObject({
+    //subscribeToTracksAutomatically: true
+  });
+
+  const statusEl = document.getElementById('status');
+
+  let isJoined = false;
+
+  function updateStatus(msg) {
+    statusEl.textContent = msg;
+    console.log('[status]', msg);
+  }
+
+  callFrame.on('error', (e) => updateStatus(`Fejl: ${e?.errorMsg || e?.message || e}`));
+
+  window.onload = (event) => {
+    console.log("page is fully loaded");
+    (async () => {
+      await initOnLoaded();
+    })();
+  };
+
+</script>
+</body>
 </html>
