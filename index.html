@@ -41,36 +41,32 @@
     var roomsPageCount = 0;
     var roomsPerPage = 10;
 
-    async function fetchDailyAdminToken() {
+	async function fetchDailyAdminToken() {
+	  const input = document.createElement('input');
+	  input.type = 'file';
+	  input.accept = 'application/json,.json';
+	  input.style.display = 'none';
+	  document.body.appendChild(input);
 
-      // read from local json file
-      const fileHandle = await self.showOpenFilePicker({
-        suggestedName: 'spine-access.json',
-        types: [{
-          description: '.json file',
-          accept: {
-            'application/json': ['.json'],
-          },
-        }],
-      });
-      const file = await fileHandle[0].getFile();
-      const textContents = await file.text();
-      var jsonContents = JSON.parse(textContents);
-      console.log('json: ' + textContents);
-      var token = jsonContents.dailyAdminToken;
-      dailyAdminToken = token;
-      console.log('dailyAdminToken = ' + dailyAdminToken);
+	  input.onchange = async (e) => {
+	    const file = e.target.files && e.target.files[0];
+	    if (!file) { document.body.removeChild(input); return; }
+	    const text = await file.text();
 
-      // reset url with it as parameter
-      var tokens = window.location.href.split('?');
-      var url = window.location.href;
-      if (1 < tokens.length) {
-        url = tokens[0];
-      }
-      url += '?' + dailyAdminTokenName + '=' + dailyAdminToken;
-      window.location.href = url; // reloads
-    }
+	    let token = '';
+	    try { token = (JSON.parse(text).dailyAdminToken || '').trim(); }
+	    catch { token = (text || '').trim(); }
 
+	    if (!token) { alert('Parsing "dailyAdminToken" failed.'); document.body.removeChild(input); return; }
+
+	    dailyAdminToken = token;
+	    var tokens = window.location.href.split('?');
+	    var url = tokens[0] + '?' + dailyAdminTokenName + '=' + encodeURIComponent(dailyAdminToken);
+	    window.location.href = url; // reloads
+	  };
+
+	  input.click();
+	}
 
     async function initOnLoaded() {
       await onRoomsDataUpdated(); // cheat call to update state
