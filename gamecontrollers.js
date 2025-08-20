@@ -6,9 +6,9 @@ var haveEvents = 'GamepadEvent' in window;
 var haveWebkitEvents = 'WebKitGamepadEvent' in window;
 var gamePads_debug = true;
 var gamePads_updateIndex = 0;
-var gamePads_data = [];
-var gamePads_data_previous = {};
 var gamePads_index2use = -1;
+var gamePads_previous = {};
+var gamePadData_changes = [];
 var rAF = window.mozRequestAnimationFrame ||
   window.webkitRequestAnimationFrame ||
   window.requestAnimationFrame;
@@ -28,7 +28,7 @@ class GamePadData {
   axes_changes = {};
   axes_changed_count = 0;
   
-  constructor(updateIndex, gamepad_prev, gamepad_next) {
+  constructor(updateIndex, gamepad_previous, gamepad_next) {
     this.update_index = updateIndex;
     if (gamepad_next) {
       this.gamepad_index = gamepad_next.index;
@@ -42,16 +42,16 @@ class GamePadData {
       this.time_utc = asDate.toISOString();
 
       for (var i=0; i<gamepad_next.buttons.length; i++) {
-        var button_values = gamepad_next.buttons[i];
-        var prev_value = (gamepad_prev) ? gamepad_prev.buttons[i].value : null; 
-        if (null == prev_value || 0.00001 < Math.abs(button_values.value - prev_value)) {
-          this.buttons_changes[i] = button_values.value;
+        var button_value = gamepad_next.buttons[i].value;
+        var prev_value = (gamepad_previous) ? gamepad_previous.button_values[i] : null; 
+        if (null == prev_value || 0.00001 < Math.abs(button_value - prev_value)) {
+          this.buttons_changes[i] = button_value;
           this.buttons_changed_count++;
         }
       }
       for (var i=0; i<gamepad_next.axes.length; i++) {
         var axis_value = gamepad_next.axes[i];
-        var prev_value = (gamepad_prev) ? gamepad_prev.axes[i] : null; 
+        var prev_value = (gamepad_previous) ? gamepad_previous.axes_values[i] : null; 
         if (null == prev_value || 0.00001 < Math.abs(axis_value - prev_value)) {
           this.axes_changes[i] = axis_value;
           this.axes_changed_count++;
@@ -87,6 +87,24 @@ function removegamepad(gamepad) {
   
 }
 
+function gamePadPartialClone(gamePad) {
+  var button_values = [];
+  var axes_values = [];
+
+  if (gamePad) {
+      for (var i=0; i<gamePad.buttons.length; i++) {
+        var button_value = gamePad.buttons[i].value;
+        button_values[i] = button_value;
+      }
+      for (var i=0; i<gamePad.axes.length; i++) {
+        var axis_value = gamePad.axes[i];
+        axes_values[i] = axis_value;
+      }
+  }
+  clone = { 'button_values' : button_values, 'axes_values' : axes_values }
+  return clone;
+}
+
 function updateStatus() {
 
 //  if (gamePads_debug && gamePads_updateIndex%1000==0) console.log("updateStatus: update#" + gamePads_updateIndex);
@@ -97,12 +115,12 @@ function updateStatus() {
     if (gamePad) {
       var gamePad_index = gamePad.index;
       if (gamePad_index == gamePads_index2use) {
-        var data_previous = gamePads_data_previous[gamePad_index];
-        var data_current = new GamePadData(gamePads_updateIndex, data_previous, gamePad);
-        gamePads_data_previous[gamePad_index] = gamePad;
-        if(0 < data_current.buttons_changed_count || 0 < data_current.axes_changed_count) {
-          gamePads_data.push(data_current);
-          if (gamePads_debug) console.log("updateStatus: update#" + gamePads_updateIndex + ", data=" + JSON.stringify(data_current));
+        var gamePad_previous = gamePads_previous[gamePad_index];
+        var gamePad_changes = new GamePadData(gamePads_updateIndex, gamePad_previous, gamePad);
+        gamePads_previous[gamePad_index] = gamePadPartialClone(gamePad);
+        if(0 < gamePad_changes.buttons_changed_count || 0 < gamePad_changes.axes_changed_count) {
+          gamePadData_changes.push(gamePad_changes);
+          if (gamePads_debug) console.log("updateStatus: update#" + gamePads_updateIndex + ", changes=" + JSON.stringify(gamePad_changes));
         }
       }
     }
