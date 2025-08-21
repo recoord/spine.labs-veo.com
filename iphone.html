@@ -68,9 +68,8 @@
     function onGamePadDataChange() {
       while(0 < gamePadData_changes.length) {
         const gamePadDataChange = gamePadData_changes.shift();
-        const dataChangeJson = JSON.stringify(gamePadDataChange);
-        if (onGamePadChange_debug) console.log("onGamePadDataChange: update#" + gamePadDataChange.update_index + ", changes=" + dataChangeJson);
-        if (call) call.sendAppMessage(dataChangeJson, '*');
+        if (onGamePadChange_debug) console.log("onGamePadDataChange: update#" + gamePadDataChange.update_index + ", changes=" + JSON.stringify(gamePadDataChange));
+        if (call) call.sendAppMessage(gamePadDataChange, '*');
       }
     };
     gamePadData_changesCallback = onGamePadDataChange;
