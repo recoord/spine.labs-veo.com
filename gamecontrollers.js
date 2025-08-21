@@ -2,14 +2,15 @@
  * Below originates from https://github.com/luser/gamepadtest/
  * 
  */
-var haveEvents = 'GamepadEvent' in window;
-var haveWebkitEvents = 'WebKitGamepadEvent' in window;
-var gamePads_debug = true;
+var gamePads_haveEvents = 'GamepadEvent' in window;
+var gamePads_haveWebkitEvents = 'WebKitGamepadEvent' in window;
+var gamePads_debug = false;
 var gamePads_updateIndex = 0;
 var gamePads_index2use = -1;
 var gamePads_previous = {};
 var gamePadData_changes = [];
-var rAF = window.mozRequestAnimationFrame ||
+var gamePadData_changesCallback = null;
+var gamePads_rAF = window.mozRequestAnimationFrame ||
   window.webkitRequestAnimationFrame ||
   window.requestAnimationFrame;
 
@@ -61,25 +62,25 @@ class GamePadData {
   }
 };
 
-function connecthandler(e) {
-  if (gamePads_debug) console.log("connecthandler: e=" + e);
-  addgamepad(e.gamepad);
+function gamePads_connecthandler(e) {
+  if (gamePads_debug) console.log("gamePads_connecthandler: e=" + e);
+  gamePads_addgamepad(e.gamepad);
 }
-function addgamepad(gamePad) {
-  if (gamePads_debug) console.log("addgamepad: gamePad.index=" + gamePad.index);
+function gamePads_addgamepad(gamePad) {
+  if (gamePads_debug) console.log("gamePads_addgamepad: gamePad.index=" + gamePad.index);
   gamePads_index2use = gamePad.index;
 
-  rAF(updateStatus);
+  gamePads_rAF(gamePads_updateStatus);
 }
 
-function disconnecthandler(e) {
-  if (gamePads_debug) console.log("disconnecthandler: e=" + e);
+function gamePads_disconnecthandler(e) {
+  if (gamePads_debug) console.log("gamePads_disconnecthandler: e=" + e);
 
-  removegamepad(e.gamepad);
+  gamePads_removegamepad(e.gamepad);
 }
 
-function removegamepad(gamepad) {
-  if (gamePads_debug) console.log("removegamepad: gamePad.index=" + gamepad.index);
+function gamePads_removegamepad(gamepad) {
+  if (gamePads_debug) console.log("gamePads_removegamepad: gamePad.index=" + gamepad.index);
 
   if (0 <= gamePads_index2use)
     if (gamepad.index == gamePads_index2use)
@@ -105,9 +106,9 @@ function gamePadPartialClone(gamePad) {
   return clone;
 }
 
-function updateStatus() {
+function gamePads_updateStatus() {
 
-//  if (gamePads_debug && gamePads_updateIndex%1000==0) console.log("updateStatus: update#" + gamePads_updateIndex);
+//  if (gamePads_debug && gamePads_updateIndex%1000==0) console.log("gamePads_updateStatus: update#" + gamePads_updateIndex);
 
   var gamePads = getGamePads();
   for (j in gamePads) {
@@ -120,13 +121,16 @@ function updateStatus() {
         gamePads_previous[gamePad_index] = gamePadPartialClone(gamePad);
         if(0 < gamePad_changes.buttons_changed_count || 0 < gamePad_changes.axes_changed_count) {
           gamePadData_changes.push(gamePad_changes);
-          if (gamePads_debug) console.log("updateStatus: update#" + gamePads_updateIndex + ", changes=" + JSON.stringify(gamePad_changes));
+          if (gamePads_debug) console.log("gamePads_updateStatus: update#" + gamePads_updateIndex + ", changes=" + JSON.stringify(gamePad_changes));
+          if (gamePadData_changesCallback) {
+            gamePadData_changesCallback();
+          }
         }
       }
     }
   }
   gamePads_updateIndex++;
-  rAF(updateStatus);
+  gamePads_rAF(gamePads_updateStatus);
 }
 
 function getGamePads() {
@@ -136,12 +140,13 @@ function getGamePads() {
   return gamePads;
 }
 
-if (haveEvents) {
-  window.addEventListener("gamepadconnected", connecthandler);
-  window.addEventListener("gamepaddisconnected", disconnecthandler);
-} else if (haveWebkitEvents) {
-  window.addEventListener("webkitgamepadconnected", connecthandler);
-  window.addEventListener("webkitgamepaddisconnected", disconnecthandler);
+
+if (gamePads_haveEvents) {
+  window.addEventListener("gamepadconnected", gamePads_connecthandler);
+  window.addEventListener("gamepaddisconnected", gamePads_disconnecthandler);
+} else if (gamePads_haveWebkitEvents) {
+  window.addEventListener("webkitgamepadconnected", gamePads_connecthandler);
+  window.addEventListener("webkitgamepaddisconnected", gamePads_disconnecthandler);
 } else {
-  setInterval(scangamepads, 500);
+  alert("Sorry, your browser doesnt seem to support gamepad events."); 
 }

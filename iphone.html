@@ -60,6 +60,21 @@
     const phWide   = document.getElementById("phWide");
     const phUltra  = document.getElementById("phUltra");
 
+    // Daily api handle
+    var call = null;
+
+    // Gamepad changes are sent to Daily as messages
+    const onGamePadChange_debug = true;
+    function onGamePadDataChange() {
+      while(0 < gamePadData_changes.length) {
+        const gamePadDataChange = gamePadData_changes.shift();
+        const dataChangeJson = JSON.stringify(gamePadDataChange);
+        if (onGamePadChange_debug) console.log("onGamePadDataChange: update#" + gamePadDataChange.update_index + ", changes=" + dataChangeJson);
+        if (call) call.sendAppMessage(dataChangeJson, '*');
+      }
+    };
+    gamePadData_changesCallback = onGamePadDataChange;
+
     if (!roomName) {
       statusEl.textContent = "Error: no room name (?name=…)";
       throw new Error("Missing ?name param");
@@ -67,7 +82,7 @@
     const roomUrl = `https://veo-labs.daily.co/${encodeURIComponent(roomName)}`;
 
     // Minimal call-objekt (ingen iframe)
-    const call = window.DailyIframe.createCallObject({
+    call = window.DailyIframe.createCallObject({
       subscribeToTracksAutomatically: true
     });
 
@@ -142,6 +157,7 @@
     }).catch(err => {
       statusEl.textContent = "Error: " + (err?.errorMsg || err?.message || err);
     });
+
   </script>
 </body>
 </html>
