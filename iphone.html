@@ -252,6 +252,7 @@
 
       if (ultra?.state === "playable" && ultraTrack) attachTrack(vUltra, phUltra, ultraTrack);
       else detach(vUltra, phUltra);
+
     }
 
     function handleAppMessage(ev) {
@@ -279,7 +280,7 @@
     }
     call
       .on("joining-meeting", () => statusEl.textContent = "Joining room…")
-      .on("joined-meeting",  () => statusEl.textContent = "Connected ✓")
+      .on("joined-meeting",  () => { statusEl.textContent = "Connected ✓"; settingsDataRequestLatestFromPhone(); })
       .on("left-meeting",    () => { statusEl.textContent = "Disconnected"; detachAll(); })
       .on("error", e => statusEl.textContent = "Error: " + (e?.errorMsg || e?.message || e))
       .on("participant-joined",  ev => maybeAttachFor(ev.participant))
@@ -302,7 +303,6 @@
       // Håndter deltagere der allerede er i rummet
       const parts = call.participants();
       Object.values(parts).forEach(p => maybeAttachFor(p));
-      settingsDataRequestLatestFromPhone();
     }).catch(err => {
       statusEl.textContent = "Error: " + (err?.errorMsg || err?.message || err);
     });
