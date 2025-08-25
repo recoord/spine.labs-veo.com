@@ -280,7 +280,7 @@
     }
     call
       .on("joining-meeting", () => statusEl.textContent = "Joining room…")
-      .on("joined-meeting",  () => { statusEl.textContent = "Connected ✓"; settingsDataRequestLatestFromPhone(); })
+      .on("joined-meeting",  () => statusEl.textContent = "Connected ✓")
       .on("left-meeting",    () => { statusEl.textContent = "Disconnected"; detachAll(); })
       .on("error", e => statusEl.textContent = "Error: " + (e?.errorMsg || e?.message || e))
       .on("participant-joined",  ev => maybeAttachFor(ev.participant))
@@ -306,7 +306,8 @@
     }).catch(err => {
       statusEl.textContent = "Error: " + (err?.errorMsg || err?.message || err);
     });
-
+    
+    settingsDataRequestLatestFromPhone();
   </script>
 </body>
 </html>
