@@ -160,7 +160,7 @@
   <div id="phone-settings-container">
     <div class="phone-settings-wrap">
       <label class="switch">
-        <input id="settingGameController" class="switch-input" type="checkbox" />
+        <input id="settingGameController" class="switch-input" type="checkbox" onchange="settingsChangeGameController(this)" />
         <span class="switch-label" data-on="GameController - On" data-off="GameController - Off"></span> 
         <span class="switch-handle"></span> 
       </label>
@@ -175,6 +175,10 @@
     const vUltra   = document.getElementById("vUltra");
     const phWide   = document.getElementById("phWide");
     const phUltra  = document.getElementById("phUltra");
+
+    function settingsChangeGameController(obj) {
+      console.log("settingsChangeGameController: obj=" + obj)
+    }
 
     // Daily api handle
     var call = null;
@@ -251,8 +255,8 @@
         console.log("handleAppMessage: ev=" + ev)
         if (ev && ev.data) {
           var data = ev.data
-          if (data.gameController) {
-            document.getElementById("settingGameController").checked = ev.message.gameController;
+          if ("gameController" in data) {
+            document.getElementById("settingGameController").checked = ev.data.gameController;
           }
         }
     }
