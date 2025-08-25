@@ -131,6 +131,9 @@
       else detach(vUltra, phUltra);
     }
 
+    function handleAppMessage(ev) {
+        console.log("handleAppMessage: ev=" + ev)
+    }
     call
       .on("joining-meeting", () => statusEl.textContent = "Joining room…")
       .on("joined-meeting",  () => statusEl.textContent = "Connected ✓")
@@ -143,7 +146,8 @@
           targetSessionId = null;
           detachAll();
         }
-      });
+      })
+      .on("app-message", ev => handleAppMessage(ev));
 
     call.join({
       url: roomUrl,
