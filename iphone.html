@@ -303,11 +303,13 @@
       // Håndter deltagere der allerede er i rummet
       const parts = call.participants();
       Object.values(parts).forEach(p => maybeAttachFor(p));
+      setTimeout(function() {
+        settingsDataRequestLatestFromPhone()
+      }, 1000); // This is ugly - but I can't figure out when it is ok to send request :(
     }).catch(err => {
       statusEl.textContent = "Error: " + (err?.errorMsg || err?.message || err);
     });
-    
-    settingsDataRequestLatestFromPhone();
+
   </script>
 </body>
 </html>
