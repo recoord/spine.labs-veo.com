@@ -254,7 +254,7 @@
         if (ev && ev.data) {
           phoneSettingsData = ev.data
           if ("gameController" in phoneSettingsData) {
-            document.getElementById("settingGameController").checked = ev.phoneSettingsData.gameController;
+            document.getElementById("settingGameController").checked = phoneSettingsData.gameController;
           }
         }
     }
