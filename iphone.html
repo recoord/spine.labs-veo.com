@@ -274,8 +274,8 @@
     function settingsDataSendToPhone() {
       if (call) call.sendAppMessage(phoneSettingsData, '*');
     }
-    function settingsAskLatestFromPhone() {
-      if (call) call.sendAppMessage({}, '*');
+    function settingsDataRequestLatestFromPhone() {
+      if (call) call.sendAppMessage({ "settingsRequestLatest" : true }, '*');
     }
     call
       .on("joining-meeting", () => statusEl.textContent = "Joining room…")
@@ -300,7 +300,7 @@
       // Håndter deltagere der allerede er i rummet
       const parts = call.participants();
       Object.values(parts).forEach(p => maybeAttachFor(p));
-      settingsAskLatestFromPhone();
+      settingsDataRequestLatestFromPhone();
     }).catch(err => {
       statusEl.textContent = "Error: " + (err?.errorMsg || err?.message || err);
     });
