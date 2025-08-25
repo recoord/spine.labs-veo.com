@@ -157,7 +157,7 @@
     </div>
   </div>
 
-  <div id="phone-settings-container">
+  <div id="phone-settings-container"">
     <div class="phone-settings-wrap">
       <label class="switch">
         <input id="settingGameController" class="switch-input" type="checkbox" onchange="settingsWebUserChangedPropertyGameController(this)" />
@@ -191,6 +191,11 @@
     gamePadData_changesCallback = onGamePadDataChange;
 
     var phoneSettingsData = {};
+    function enableDisableSettingsUI() {
+      var el = document.getElementById("settingGameController") = !("gameController" in phoneSettingsData);
+    }
+    enableDisableSettingsUI();
+
 
     if (!roomName) {
       statusEl.textContent = "Error: no room name (?name=…)";
@@ -257,6 +262,7 @@
             document.getElementById("settingGameController").checked = phoneSettingsData.gameController;
           }
         }
+        enableDisableSettingsUI();
     }
     function settingsWebUserChangedPropertyGameController(obj) {
       //console.log("settingsWebUserChangedPropertyGameController: obj=" + obj)
@@ -267,6 +273,9 @@
     }
     function settingsDataSendToPhone() {
       if (call) call.sendAppMessage(phoneSettingsData, '*');
+    }
+    function settingsAskLatestFromPhone() {
+      if (call) call.sendAppMessage({}, '*');
     }
     call
       .on("joining-meeting", () => statusEl.textContent = "Joining room…")
@@ -291,6 +300,7 @@
       // Håndter deltagere der allerede er i rummet
       const parts = call.participants();
       Object.values(parts).forEach(p => maybeAttachFor(p));
+      settingsAskLatestFromPhone();
     }).catch(err => {
       statusEl.textContent = "Error: " + (err?.errorMsg || err?.message || err);
     });
