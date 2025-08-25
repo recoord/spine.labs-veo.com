@@ -287,6 +287,8 @@
       .on("participant-left",    ev => {
         if (ev?.participant?.session_id === targetSessionId) {
           targetSessionId = null;
+          phoneSettingsData = {};
+          enableDisableSettingsUI();
           detachAll();
         }
       })
