@@ -250,7 +250,7 @@
     }
 
     function handleAppMessage(ev) {
-        console.log("handleAppMessage: ev=" + ev)
+        //console.log("handleAppMessage: ev=" + ev)
         if (ev && ev.data) {
           phoneSettingsData = ev.data
           if ("gameController" in phoneSettingsData) {
@@ -259,7 +259,7 @@
         }
     }
     function settingsWebUserChangedPropertyGameController(obj) {
-      console.log("settingsWebUserChangedPropertyGameController: obj=" + obj)
+      //console.log("settingsWebUserChangedPropertyGameController: obj=" + obj)
       if ("gameController" in phoneSettingsData) {
         phoneSettingsData.gameController = obj.checked;
         settingsDataSendToPhone();
