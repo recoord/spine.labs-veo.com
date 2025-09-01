@@ -236,7 +236,7 @@
     function maybeAttachFor(p) {
       if (!p || p.local) return;
 
-      if (!targetSessionId && (p.tracks?.wide || p.tracks?.ultraWide)) {
+      if (!targetSessionId) { // && (p.tracks?.wide || p.tracks?.ultraWide)) {
         targetSessionId = p.session_id;
       }
       if (p.session_id !== targetSessionId) return;
