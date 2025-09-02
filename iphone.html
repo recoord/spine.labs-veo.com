@@ -161,6 +161,16 @@
   <div id="phone-settings-container"">
     <div class="phone-settings-wrap">
       <label class="switch">
+        <input id="settingsDailyStreamWide" class="switch-input" type="checkbox" onchange="settingsWebUserChangedPropertyDailyStreamWide(this)" />
+        <span class="switch-label" data-on="DailyStreamWide - On" data-off="DailyStreamWide - Off"></span> 
+        <span class="switch-handle"></span> 
+      </label>
+      <label class="switch">
+        <input id="settingsDailyStreamUltra" class="switch-input" type="checkbox" onchange="settingsWebUserChangedPropertyDailyStreamUltra(this)" />
+        <span class="switch-label" data-on="DailyStreamUltra - On" data-off="DailyStreamUltra - Off"></span> 
+        <span class="switch-handle"></span> 
+      </label>
+      <label class="switch">
         <input id="settingsGameController" class="switch-input" type="checkbox" onchange="settingsWebUserChangedPropertyGameController(this)" />
         <span class="switch-label" data-on="GameController - On" data-off="GameController - Off"></span> 
         <span class="switch-handle"></span> 
@@ -177,6 +187,8 @@
     const vUltra   = document.getElementById("vUltra");
     const phWide   = document.getElementById("phWide");
     const phUltra  = document.getElementById("phUltra");
+    const phoneSettingsDailyStreamWideEl = document.getElementById("settingsDailyStreamWide");
+    const phoneSettingsDailyStreamUltraEl = document.getElementById("settingsDailyStreamUltra");
     const phoneSettingsGameControllerEl = document.getElementById("settingsGameController");
 
     // Daily api handle
@@ -200,11 +212,17 @@
 
       let isPhoneConnected = (targetSessionId !== null);
       let isGameControllerEnabled = isPhoneConnected && "gameController" in phoneSettingsData && phoneSettingsData.gameController;
+      let isDailyStreamWideEnabled = isPhoneConnected && "DailyStreamWide" in phoneSettingsData && phoneSettingsData.DailyStreamWide;
+      let isDailyStreamUltraEnabled = isPhoneConnected && "DailyStreamUltra" in phoneSettingsData && phoneSettingsData.DailyStreamUltra;
 
       if (isPhoneConnected) 
         phoneStatusEl.textContent = "Phone: Connected ✓";
       else
         phoneStatusEl.textContent = "Phone: Disconnected"
+      phoneSettingsDailyStreamWideEl.disabled = !(isPhoneConnected);
+      phoneSettingsDailyStreamWideEl.checked = isDailyStreamWideEnabled;
+      phoneSettingsDailyStreamUltraEl.disabled = !(isPhoneConnected);
+      phoneSettingsDailyStreamUltraEl.checked = isDailyStreamUltraEnabled;
       phoneSettingsGameControllerEl.disabled = !(isPhoneConnected);
       phoneSettingsGameControllerEl.checked = isGameControllerEnabled;
     }
@@ -269,12 +287,27 @@
     function handleAppMessage(ev) {
         //console.log("handleAppMessage: ev=" + ev)
         if (ev && ev.data) {
-          phoneSettingsData = ev.data
+          phoneSettingsData = ev.data;
+          /*
+          DailyStreamUltra,
+          DailyStreamWide,
+          */
         }
         updatePhoneSettingsUI();
     }
+    function settingsWebUserChangedPropertyDailyStreamWide(obj) {
+      if ("gameController" in phoneSettingsData) {
+        phoneSettingsData.DailyStreamWide = obj.checked;
+        settingsDataSendToPhone();
+      }
+    }
+    function settingsWebUserChangedPropertyDailyStreamUltra(obj) {
+      if ("gameController" in phoneSettingsData) {
+        phoneSettingsData.DailyStreamUltra = obj.checked;
+        settingsDataSendToPhone();
+      }
+    }
     function settingsWebUserChangedPropertyGameController(obj) {
-      //console.log("settingsWebUserChangedPropertyGameController: obj=" + obj)
       if ("gameController" in phoneSettingsData) {
         phoneSettingsData.gameController = obj.checked;
         settingsDataSendToPhone();
