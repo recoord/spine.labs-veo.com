@@ -37,9 +37,80 @@
     .hidden{display:none}
   </style>
   <style>
-    .switch {
+    .switch-group {
       position: relative;
       display: block;
+      vertical-align: top;
+      width: 200px;
+      height: 30px;
+      padding: 3px;
+      margin: 0 10px 10px 0;
+      background: linear-gradient(to bottom, #E1B42B, #E1B42B 25px);
+      background-image: -webkit-linear-gradient(top, #E1B42B, #E1B42B 25px);
+      border-radius: 1px;
+      box-shadow: inset 0 -1px #E1B42B, inset 0 1px 1px rgba(0, 0, 0, 0.05);
+      cursor: pointer;
+      box-sizing:content-box;
+    }
+    .switch-group-input {
+      position: absolute;
+      top: 0;
+      left: 0;
+      opacity: 0;
+      box-sizing:content-box;
+    }
+    .switch-group-label {
+      position: relative;
+      display: block;
+      height: inherit;
+      font-size: 10px;
+      text-transform: uppercase;
+      background: #eceeef;
+      border-radius: inherit;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.12), inset 0 0 2px rgba(0, 0, 0, 0.15);
+      box-sizing:content-box;
+    }
+    .switch-group-label:before, .switch-group-label:after {
+      position: absolute;
+      top: 50%;
+      margin-top: -.5em;
+      line-height: 1;
+      -webkit-transition: inherit;
+      -moz-transition: inherit;
+      -o-transition: inherit;
+      transition: inherit;
+      box-sizing:content-box;
+    }
+    .switch-group-label:before {
+      content: attr(data-off);
+      right: 21px;
+      color: #aaaaaa;
+      text-shadow: 0 1px rgba(255, 255, 255, 0.5);
+    }
+    .switch-group-label:after {
+      content: attr(data-on);
+      left: 21px;
+      color: #FFFFFF;
+      text-shadow: 0 1px rgba(0, 0, 0, 0.2);
+      opacity: 0;
+    }
+    .switch-group-input:checked ~ .switch-group-label {
+      background: #E1B42B;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15), inset 0 0 3px rgba(0, 0, 0, 0.2);
+    }
+    .switch-group-input:checked ~ .switch-group-label:before {
+      opacity: 0;
+    }
+    .switch-group-input:checked ~ .switch-group-label:after {
+      opacity: 1;
+    }
+    .switch-group-input:checked {
+      left: 174px;
+      box-shadow: -1px 1px 5px rgba(0, 0, 0, 0.2);
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
       vertical-align: top;
       width: 200px;
       height: 30px;
@@ -141,6 +212,12 @@
       -moz-transition: All 0.3s ease;
       -o-transition: All 0.3s ease;
     }    
+    .switch-group-label {
+      transition: All 0.3s ease;
+      -webkit-transition: All 0.3s ease;
+      -moz-transition: All 0.3s ease;
+      -o-transition: All 0.3s ease;
+    }    
   </style>
 </head>
 <body>
@@ -160,17 +237,21 @@
 
   <div id="phone-settings-container"">
     <div class="phone-settings-wrap">
-      <label class="switch">
+      <label class="switch-group">
+        <input id="settingsGroupWebRtc" class="switch-group-input" type="checkbox" onchange="settingsWebUserGroupToggle(this)" />
+        <span class="switch-group-label" data-on="Web RTC Settings" data-off="Web RTC Settings"></span> 
+      </label>
+      <label id="settingsDailyStreamWideLabel" class="switch">
         <input id="settingsDailyStreamWide" class="switch-input" type="checkbox" onchange="settingsWebUserChangedPropertyDailyStreamWide(this)" />
         <span class="switch-label" data-on="DailyStreamWide - On" data-off="DailyStreamWide - Off"></span> 
         <span class="switch-handle"></span> 
       </label>
-      <label class="switch">
+      <label id="settingsDailyStreamUltraLabel" class="switch">
         <input id="settingsDailyStreamUltra" class="switch-input" type="checkbox" onchange="settingsWebUserChangedPropertyDailyStreamUltra(this)" />
         <span class="switch-label" data-on="DailyStreamUltra - On" data-off="DailyStreamUltra - Off"></span> 
         <span class="switch-handle"></span> 
       </label>
-      <label class="switch">
+      <label id="settingsGameControllerLabel" class="switch">
         <input id="settingsGameController" class="switch-input" type="checkbox" onchange="settingsWebUserChangedPropertyGameController(this)" />
         <span class="switch-label" data-on="GameController - On" data-off="GameController - Off"></span> 
         <span class="switch-handle"></span> 
@@ -190,6 +271,10 @@
     const phoneSettingsDailyStreamWideEl = document.getElementById("settingsDailyStreamWide");
     const phoneSettingsDailyStreamUltraEl = document.getElementById("settingsDailyStreamUltra");
     const phoneSettingsGameControllerEl = document.getElementById("settingsGameController");
+    const settingsGroupWebRtcEl = document.getElementById("settingsGroupWebRtc");
+    const phoneSettingsDailyStreamWideLabelEl = document.getElementById("settingsDailyStreamWideLabel");
+    const phoneSettingsDailyStreamUltraLabelEl = document.getElementById("settingsDailyStreamUltraLabel");
+    const phoneSettingsGameControllerLabelEl = document.getElementById("settingsGameControllerLabel");
 
     // Daily api handle
     var call = null;
@@ -225,7 +310,13 @@
       phoneSettingsDailyStreamUltraEl.checked = isDailyStreamUltraEnabled;
       phoneSettingsGameControllerEl.disabled = !(isPhoneConnected);
       phoneSettingsGameControllerEl.checked = isGameControllerEnabled;
+      
+      let displayVal = settingsGroupWebRtcEl.checked ? 'inline-block' : 'none';
+      phoneSettingsDailyStreamWideLabelEl.style.display = displayVal;
+      phoneSettingsDailyStreamUltraLabelEl.style.display = displayVal;
+      phoneSettingsGameControllerLabelEl.style.display = displayVal;      
     }
+    settingsGroupWebRtcEl.checked = true;
     updatePhoneSettingsUI();
 
 
@@ -288,12 +379,11 @@
         //console.log("handleAppMessage: ev=" + ev)
         if (ev && ev.data) {
           phoneSettingsData = ev.data;
-          /*
-          DailyStreamUltra,
-          DailyStreamWide,
-          */
         }
         updatePhoneSettingsUI();
+    }
+    function settingsWebUserGroupToggle(obj) {
+      updatePhoneSettingsUI();    
     }
     function settingsWebUserChangedPropertyDailyStreamWide(obj) {
       if ("gameController" in phoneSettingsData) {
