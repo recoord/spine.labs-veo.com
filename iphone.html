@@ -161,7 +161,7 @@
   <div id="phone-settings-container"">
     <div class="phone-settings-wrap">
       <label class="switch">
-        <input id="settingGameController" class="switch-input" type="checkbox" onchange="settingsWebUserChangedPropertyGameController(this)" />
+        <input id="settingsGameController" class="switch-input" type="checkbox" onchange="settingsWebUserChangedPropertyGameController(this)" />
         <span class="switch-label" data-on="GameController - On" data-off="GameController - Off"></span> 
         <span class="switch-handle"></span> 
       </label>
@@ -177,9 +177,12 @@
     const vUltra   = document.getElementById("vUltra");
     const phWide   = document.getElementById("phWide");
     const phUltra  = document.getElementById("phUltra");
+    const phoneSettingsGameControllerEl = document.getElementById("settingsGameController");
 
     // Daily api handle
     var call = null;
+    // Vis wide/ultra fra første remote, der har disse spor
+    let targetSessionId = null;
 
     // Gamepad changes are sent to Daily as messages
     const onGamePadChange_debug = true;
@@ -193,10 +196,19 @@
     gamePadData_changesCallback = onGamePadDataChange;
 
     var phoneSettingsData = {};
-    function enableDisableSettingsUI() {
-      document.getElementById("settingGameController").disabled = !("gameController" in phoneSettingsData);
+    function updatePhoneSettingsUI() {
+
+      let isPhoneConnected = (targetSessionId !== null);
+      let isGameControllerEnabled = isPhoneConnected && "gameController" in phoneSettingsData && phoneSettingsData.gameController;
+
+      if (isPhoneConnected) 
+        phoneStatusEl.textContent = "Phone: Connected ✓";
+      else
+        phoneStatusEl.textContent = "Phone: Disconnected"
+      phoneSettingsGameControllerEl.disabled = !(isPhoneConnected);
+      phoneSettingsGameControllerEl.checked = isGameControllerEnabled;
     }
-    enableDisableSettingsUI();
+    updatePhoneSettingsUI();
 
 
     if (!roomName) {
@@ -232,9 +244,6 @@
       detach(vUltra, phUltra);
     }
 
-    // Vis wide/ultra fra første remote, der har disse spor
-    let targetSessionId = null;
-
     function maybeAttachFor(p) {
       if (!p || p.local) return;
 
@@ -261,11 +270,8 @@
         //console.log("handleAppMessage: ev=" + ev)
         if (ev && ev.data) {
           phoneSettingsData = ev.data
-          if ("gameController" in phoneSettingsData) {
-            document.getElementById("settingGameController").checked = phoneSettingsData.gameController;
-          }
         }
-        enableDisableSettingsUI();
+        updatePhoneSettingsUI();
     }
     function settingsWebUserChangedPropertyGameController(obj) {
       //console.log("settingsWebUserChangedPropertyGameController: obj=" + obj)
@@ -281,23 +287,32 @@
       if (call) call.sendAppMessage({ "settingsRequestLatest" : true }, '*');
     }
     call
-      .on("joining-meeting", () => browserStatusEl.textContent = "Browser: Joining room…")
-      .on("joined-meeting",  () => browserStatusEl.textContent = "Browser: Connected ✓")
-      .on("left-meeting",    () => { browserStatusEl.textContent = "Browser: Disconnected"; detachAll(); })
+      .on("joining-meeting", () => {
+        browserStatusEl.textContent = "Browser: Joining room…";
+        updatePhoneSettingsUI()
+      })
+      .on("joined-meeting",  () => { 
+        browserStatusEl.textContent = "Browser: Connected ✓";
+        updatePhoneSettingsUI()
+      })
+      .on("left-meeting",    () => { 
+        browserStatusEl.textContent = "Browser: Disconnected"; 
+        detachAll(); 
+        updatePhoneSettingsUI();
+      })
       .on("error", e => browserStatusEl.textContent = "Browser: Error! " + (e?.errorMsg || e?.message || e))
       .on("participant-joined",  ev => {
         maybeAttachFor(ev.participant);
-        if (targetSessionId) phoneStatusEl.textContent = "Phone: Connected ✓"
+        updatePhoneSettingsUI();
       })
       .on("participant-updated", ev => maybeAttachFor(ev.participant))
       .on("participant-left",    ev => {
         if (ev?.participant?.session_id === targetSessionId) {
           targetSessionId = null;
           phoneSettingsData = {};
-          enableDisableSettingsUI();
           detachAll();
         }
-        if (!targetSessionId) phoneStatusEl.textContent = "Phone: Disconnected"
+        updatePhoneSettingsUI();
       })
       .on("app-message", ev => handleAppMessage(ev));
 
