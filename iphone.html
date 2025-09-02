@@ -144,7 +144,8 @@
   </style>
 </head>
 <body>
-  <div id="status">Connecting…</div>
+  <div id="browserStatus">Browser: ?</div>
+  <div id="phoneStatus">Phone: ?</div>
 
   <div id="video-container">
     <div class="video-wrap">
@@ -170,7 +171,8 @@
   <script>
     const params   = new URLSearchParams(window.location.search);
     const roomName = params.get("name");
-    const statusEl = document.getElementById("status");
+    const browserStatusEl = document.getElementById("browserStatus");
+    const phoneStatusEl = document.getElementById("phoneStatus");
     const vWide    = document.getElementById("vWide");
     const vUltra   = document.getElementById("vUltra");
     const phWide   = document.getElementById("phWide");
@@ -198,7 +200,7 @@
 
 
     if (!roomName) {
-      statusEl.textContent = "Error: no room name (?name=…)";
+      browserStatusEl.textContent = "Browser: Error! no room name (?name=…)";
       throw new Error("Missing ?name param");
     }
     const roomUrl = `https://veo-labs.daily.co/${encodeURIComponent(roomName)}`;
@@ -279,11 +281,14 @@
       if (call) call.sendAppMessage({ "settingsRequestLatest" : true }, '*');
     }
     call
-      .on("joining-meeting", () => statusEl.textContent = "Joining room…")
-      .on("joined-meeting",  () => statusEl.textContent = "Connected ✓")
-      .on("left-meeting",    () => { statusEl.textContent = "Disconnected"; detachAll(); })
-      .on("error", e => statusEl.textContent = "Error: " + (e?.errorMsg || e?.message || e))
-      .on("participant-joined",  ev => maybeAttachFor(ev.participant))
+      .on("joining-meeting", () => browserStatusEl.textContent = "Browser: Joining room…")
+      .on("joined-meeting",  () => browserStatusEl.textContent = "Browser: Connected ✓")
+      .on("left-meeting",    () => { browserStatusEl.textContent = "Browser: Disconnected"; detachAll(); })
+      .on("error", e => browserStatusEl.textContent = "Browser: Error! " + (e?.errorMsg || e?.message || e))
+      .on("participant-joined",  ev => {
+        maybeAttachFor(ev.participant);
+        if (targetSessionId) phoneStatusEl.textContent = "Phone: Connected ✓"
+      })
       .on("participant-updated", ev => maybeAttachFor(ev.participant))
       .on("participant-left",    ev => {
         if (ev?.participant?.session_id === targetSessionId) {
@@ -292,6 +297,7 @@
           enableDisableSettingsUI();
           detachAll();
         }
+        if (!targetSessionId) phoneStatusEl.textContent = "Phone: Disconnected"
       })
       .on("app-message", ev => handleAppMessage(ev));
 
@@ -307,7 +313,7 @@
         settingsDataRequestLatestFromPhone()
       }, 1000); // This is ugly - but I can't figure out when it is ok to send request :(
     }).catch(err => {
-      statusEl.textContent = "Error: " + (err?.errorMsg || err?.message || err);
+      browserStatusEl.textContent = "Error: " + (err?.errorMsg || err?.message || err);
     });
 
   </script>
