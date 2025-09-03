@@ -261,7 +261,6 @@
         <span class="switch-label" data-on="customerBuild" data-off="customerBuild"></span> 
         <span class="switch-handle"></span> 
       </label>
-      <!-- version-->
     </div>
     <div class="phone-settings-capture">
       <label class="switch-group">
@@ -334,11 +333,27 @@
     </div>
     <div class="phone-settings-recordingstorage">
       <label class="switch-group">
-        <input id="settingsGroupTwitch" class="switch-group-input" type="checkbox" onchange="updatePhoneSettingsUI()" />
+        <input id="settingsGroupRecordingStorage" class="switch-group-input" type="checkbox" onchange="updatePhoneSettingsUI()" />
         <span class="switch-group-label" data-on="Recording Storage" data-off="Recording Storage"></span> 
       </label>
-      <!-- storageLocation-->
+      <label id="settingsInternalStorageLabel" class="switch">
+        <input id="settingsInternalStorage" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+        <span class="switch-label" data-on="InternalStorage" data-off="InternalStorage"></span> 
+        <span class="switch-handle"></span> 
+      </label>
+      <label id="settingsExternalStorageLabel" class="switch">
+        <input id="settingsExternalStorage" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+        <span class="switch-label" data-on="ExternalStorage" data-off="ExternalStorage"></span> 
+        <span class="switch-handle"></span> 
+      </label>
+      <label id="settingsCloudStorageLabel" class="switch">
+        <input id="settingsCloudStorage" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+        <span class="switch-label" data-on="CloudStorage" data-off="CloudStorage"></span> 
+        <span class="switch-handle"></span> 
+      </label>
+
     </div>
+    <div id="phone-settings-version">Settings Version: ?</div>
   </div>
 
   <script>
@@ -350,6 +365,8 @@
     const vUltra   = document.getElementById("vUltra");
     const phWide   = document.getElementById("phWide");
     const phUltra  = document.getElementById("phUltra");
+
+    const phoneSettingsVersionEl = document.getElementById("phone-settings-version");
 
     const phoneSettingsGroupAppEl = document.getElementById("settingsGroupApp");
     const phoneSettingsCustomerBuildLabelEl = document.getElementById("settingsCustomerBuildLabel");
@@ -382,6 +399,12 @@
     const phoneSettingsGameControllerEl = document.getElementById("settingsGameController");
 
     const phoneSettingsGroupRecordingStorageEl = document.getElementById("settingsGroupRecordingStorage");
+    const phoneSettingsInternalStorageLabelEl = document.getElementById("settingsInternalStorageLabel");
+    const phoneSettingsExternalStorageLabelEl = document.getElementById("settingsExternalStorageLabel");
+    const phoneSettingsCloudStorageLabelEl = document.getElementById("settingsCloudStorageLabel");
+    const phoneSettingsInternalStorageEl = document.getElementById("settingsInternalStorage");
+    const phoneSettingsExternalStorageEl = document.getElementById("settingsExternalStorage");
+    const phoneSettingsCloudStorageEl = document.getElementById("settingsCloudStorage");
 
     // Daily api handle
     var call = null;
@@ -406,6 +429,9 @@
 
       let isPhoneConnected = (targetSessionId !== null);
 
+      let hasPhoneSettingsVersion = isPhoneConnected && "version" in phoneSettingsData && phoneSettingsData.version;
+      let phoneSettingsVersion = hasPhoneSettingsVersion ? phoneSettingsData.version : "<?>";
+
       let isCustomerBuildEnabled = isPhoneConnected && "customerBuild" in phoneSettingsData && phoneSettingsData.customerBuild;
 
       let isCaptureWideEnabled = isPhoneConnected && "captureWide" in phoneSettingsData && phoneSettingsData.captureWide;
@@ -421,12 +447,18 @@
       let isDailyStreamUltraEnabled = isPhoneConnected && "DailyStreamUltra" in phoneSettingsData && phoneSettingsData.DailyStreamUltra;
       let isGameControllerEnabled = isPhoneConnected && "gameController" in phoneSettingsData && phoneSettingsData.gameController;
 
+      let isInternalStorageEnabled = isPhoneConnected && "storageLocation" in phoneSettingsData && "internalStorage" == phoneSettingsData.storageLocation;
+      let isExternalStorageEnabled = isPhoneConnected && "storageLocation" in phoneSettingsData && "externalStorage" == phoneSettingsData.storageLocation;
+      let isCloudStorageEnabled = isPhoneConnected && "storageLocation" in phoneSettingsData && "cloudStorage" == phoneSettingsData.storageLocation;
+
       // Update text and controls
 
       if (isPhoneConnected) 
         phoneStatusEl.textContent = "Phone: Connected ✓";
       else
         phoneStatusEl.textContent = "Phone: Disconnected"
+
+      phoneSettingsVersionEl.textContent = "Settings Version: " + phoneSettingsVersion;
 
       phoneSettingsCustomerBuildEl.disabled = !(isPhoneConnected);
       let phoneSettingsCustomerBuildCheckedWas = phoneSettingsCustomerBuildEl.checked;
@@ -462,6 +494,16 @@
       phoneSettingsGameControllerEl.disabled = !(isPhoneConnected);
       let phoneSettingsGameControllerCheckedWas = phoneSettingsGameControllerEl.checked;
       phoneSettingsGameControllerEl.checked = isGameControllerEnabled;
+
+      phoneSettingsInternalStorageEl.disabled = !(isPhoneConnected);
+      let phoneSettingsInternalStorageCheckedWas = phoneSettingsInternalStorageEl.checked;
+      phoneSettingsInternalStorageEl.checked = isInternalStorageEnabled;
+      phoneSettingsExternalStorageEl.disabled = !(isPhoneConnected);
+      let phoneSettingsExternalStorageCheckedWas = phoneSettingsExternalStorageEl.checked;
+      phoneSettingsExternalStorageEl.checked = isExternalStorageEnabled;
+      phoneSettingsCloudStorageEl.disabled = !(isPhoneConnected);
+      let phoneSettingsCloudStorageCheckedWas = phoneSettingsCloudStorageEl.checked;
+      phoneSettingsCloudStorageEl.checked = isCloudStorageEnabled;
 
       // Logically Toggles groups - any On event will expand a group, any Off event can collapse the group if non are On 
 
@@ -515,6 +557,19 @@
           phoneSettingsGroupWebRtcEl.checked = true;
       }
 
+      if (phoneSettingsGroupRecordingStorageEl.checked) {
+        if ((phoneSettingsInternalStorageCheckedWas && !phoneSettingsInternalStorageEl.checked)
+          || (phoneSettingsExternalStorageCheckedWas && !phoneSettingsExternalStorageEl.checked)
+          || (phoneSettingsCloudStorageCheckedWas && !phoneSettingsCloudStorageEl.checked))
+          phoneSettingsGroupRecordingStorageEl.checked = phoneSettingsInternalStorageEl.checked || phoneSettingsExternalStorageEl.checked || phoneSettingsCloudStorageEl.checked;
+      } else {
+        if ((!phoneSettingsInternalStorageCheckedWas && phoneSettingsInternalStorageEl.checked)
+          || (!phoneSettingsExternalStorageCheckedWas && phoneSettingsExternalStorageEl.checked)
+          || (!phoneSettingsCloudStorageCheckedWas && phoneSettingsCloudStorageEl.checked))
+          phoneSettingsGroupRecordingStorageEl.checked = true;
+      }
+
+
       // Visually Toggles groups
 
       let displayValApp = phoneSettingsGroupAppEl.checked ? 'inline-block' : 'none';
@@ -532,10 +587,15 @@
       let displayValTwitch = phoneSettingsGroupTwitchEl.checked ? 'inline-block' : 'none';
       phoneSettingsTwitchStreamLabelEl.style.display = displayValTwitch;
 
-      let displayVal = phoneSettingsGroupWebRtcEl.checked ? 'inline-block' : 'none';
-      phoneSettingsDailyStreamWideLabelEl.style.display = displayVal;
-      phoneSettingsDailyStreamUltraLabelEl.style.display = displayVal;
-      phoneSettingsGameControllerLabelEl.style.display = displayVal;      
+      let displayValWebRtc = phoneSettingsGroupWebRtcEl.checked ? 'inline-block' : 'none';
+      phoneSettingsDailyStreamWideLabelEl.style.display = displayValWebRtc;
+      phoneSettingsDailyStreamUltraLabelEl.style.display = displayValWebRtc;
+      phoneSettingsGameControllerLabelEl.style.display = displayValWebRtc;      
+
+      let displayValRecordingStorage = phoneSettingsGroupRecordingStorageEl.checked ? 'inline-block' : 'none';
+      phoneSettingsInternalStorageLabelEl.style.display = displayValRecordingStorage;
+      phoneSettingsExternalStorageLabelEl.style.display = displayValRecordingStorage;
+      phoneSettingsCloudStorageLabelEl.style.display = displayValRecordingStorage;
     }
     updatePhoneSettingsUI();
 
@@ -621,6 +681,10 @@
         case phoneSettingsDailyStreamWideEl.id: phoneSettingsData.DailyStreamWide = obj.checked; break;
         case phoneSettingsDailyStreamUltraEl.id: phoneSettingsData.DailyStreamUltra = obj.checked; break;
         case phoneSettingsGameControllerEl.id: phoneSettingsData.gameController = obj.checked; break;
+
+        case phoneSettingsInternalStorageEl.id: if (obj.checked) phoneSettingsData.storageLocation = "internalStorage"; break;
+        case phoneSettingsExternalStorageEl.id: if (obj.checked) phoneSettingsData.storageLocation = "externalStorage"; break;
+        case phoneSettingsCloudStorageEl.id: if (obj.checked) phoneSettingsData.storageLocation = "cloudStorage"; break;
       }
       settingsDataSendToPhone();
     }
