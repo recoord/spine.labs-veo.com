@@ -84,7 +84,7 @@
     .switch-group-label:before {
       content: attr(data-off);
       left: 21px;
-      color: #aaaaaa;
+      color: #888888;
       text-shadow: 0 1px rgba(255, 255, 255, 0.5);
     }
     .switch-group-label:after {
@@ -155,7 +155,7 @@
     .switch-label:before {
       content: attr(data-off);
       right: 11px;
-      color: #aaaaaa;
+      color: #888888;
       text-shadow: 0 1px rgba(255, 255, 255, 0.5);
     }
     .switch-label:after {
@@ -174,6 +174,9 @@
     }
     .switch-input:checked ~ .switch-label:after {
       opacity: 1;
+    }
+    .switch-input:disabled ~ .switch-label:before {
+      color: #dddddd;
     }
     .switch-handle {
       position: absolute;
@@ -203,7 +206,19 @@
       left: 134px;
       box-shadow: -1px 1px 5px rgba(0, 0, 0, 0.2);
     }
-    
+    .switch-input:disabled ~ .switch-handle {
+      top: 12px;
+      left: 12px;
+      width: 0px;
+      height: 0px;
+    }
+    .switch-input:disabled ~ .switch-handle:before {
+      top: 12px;
+      left: 12px;
+      width: 0px;
+      height: 0px;
+    }
+
     /* Transition
     ========================== */
     .switch-label, .switch-handle {
@@ -430,11 +445,11 @@
       let phoneSettingsSaveUltraCheckedWas = phoneSettingsSaveUltraEl.checked;
       phoneSettingsSaveUltraEl.checked = isSaveUltraEnabled;
 
-      phoneSettingsYouTubeStreamEl.disabled = !(isPhoneConnected);
+      phoneSettingsYouTubeStreamEl.disabled = !(isPhoneConnected && isCaptureWideEnabled);
       let phoneSettingsYouTubeStreamCheckedWas = phoneSettingsYouTubeStreamEl.checked;
       phoneSettingsYouTubeStreamEl.checked = isYouTubeStreamEnabled;
 
-      phoneSettingsTwitchStreamEl.disabled = !(isPhoneConnected);
+      phoneSettingsTwitchStreamEl.disabled = !(isPhoneConnected && isCaptureWideEnabled);
       let phoneSettingsTwitchStreamCheckedWas = phoneSettingsTwitchStreamEl.checked;
       phoneSettingsTwitchStreamEl.checked = isTwitchStreamEnabled;
 
