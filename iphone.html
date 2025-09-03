@@ -41,8 +41,8 @@
       position: relative;
       display: block;
       vertical-align: top;
-      width: 200px;
-      height: 30px;
+      width: 150px;
+      height: 20px;
       padding: 3px;
       margin: 0 10px 10px 0;
       background: linear-gradient(to bottom, #E1B42B, #E1B42B 25px);
@@ -83,13 +83,13 @@
     }
     .switch-group-label:before {
       content: attr(data-off);
-      right: 21px;
+      left: 21px;
       color: #aaaaaa;
       text-shadow: 0 1px rgba(255, 255, 255, 0.5);
     }
     .switch-group-label:after {
       content: attr(data-on);
-      left: 21px;
+      right: 21px;
       color: #FFFFFF;
       text-shadow: 0 1px rgba(0, 0, 0, 0.2);
       opacity: 0;
@@ -112,8 +112,8 @@
       position: relative;
       display: inline-block;
       vertical-align: top;
-      width: 200px;
-      height: 30px;
+      width: 150px;
+      height: 20px;
       padding: 3px;
       margin: 0 10px 10px 0;
       background: linear-gradient(to bottom, #eeeeee, #FFFFFF 25px);
@@ -179,8 +179,8 @@
       position: absolute;
       top: 4px;
       left: 4px;
-      width: 28px;
-      height: 28px;
+      width: 18px;
+      height: 18px;
       background: linear-gradient(to bottom, #FFFFFF 40%, #f0f0f0);
       background-image: -webkit-linear-gradient(top, #FFFFFF 40%, #f0f0f0);
       border-radius: 100%;
@@ -200,7 +200,7 @@
       box-shadow: inset 0 1px rgba(0, 0, 0, 0.02);
     }
     .switch-input:checked ~ .switch-handle {
-      left: 174px;
+      left: 134px;
       box-shadow: -1px 1px 5px rgba(0, 0, 0, 0.2);
     }
     
@@ -236,26 +236,93 @@
   </div>
 
   <div id="phone-settings-container"">
-    <div class="phone-settings-wrap">
+    <div class="phone-settings-app">
       <label class="switch-group">
-        <input id="settingsGroupWebRtc" class="switch-group-input" type="checkbox" onchange="settingsWebUserGroupToggle(this)" />
-        <span class="switch-group-label" data-on="Web RTC Settings" data-off="Web RTC Settings"></span> 
+        <input id="settingsGroupApp" class="switch-group-input" type="checkbox" onchange="updatePhoneSettingsUI()" />
+        <span class="switch-group-label" data-on="App" data-off="App"></span> 
+      </label>
+      <label id="settingsCustomerBuildLabel" class="switch">
+        <input id="settingsCustomerBuild" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+        <span class="switch-label" data-on="customerBuild" data-off="customerBuild"></span> 
+        <span class="switch-handle"></span> 
+      </label>
+      <!-- version-->
+    </div>
+    <div class="phone-settings-capture">
+      <label class="switch-group">
+        <input id="settingsGroupCapture" class="switch-group-input" type="checkbox" onchange="updatePhoneSettingsUI()" />
+        <span class="switch-group-label" data-on="Capture" data-off="Capture"></span> 
+      </label>
+      <label id="settingsCaptureWideLabel" class="switch">
+        <input id="settingsCaptureWide" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+        <span class="switch-label" data-on="captureWide" data-off="captureWide"></span> 
+        <span class="switch-handle"></span> 
+      </label>
+      <label id="settingsSaveWideLabel" class="switch">
+        <input id="settingsSaveWide" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+        <span class="switch-label" data-on="saveWide" data-off="saveWide"></span> 
+        <span class="switch-handle"></span> 
+      </label>
+      <label id="settingsCaptureUltraLabel" class="switch">
+        <input id="settingsCaptureUltra" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+        <span class="switch-label" data-on="captureUltra" data-off="captureUltra"></span> 
+        <span class="switch-handle"></span> 
+      </label>
+      <label id="settingsSaveUltraLabel" class="switch">
+        <input id="settingsSaveUltra" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+        <span class="switch-label" data-on="saveUltra" data-off="saveUltra"></span> 
+        <span class="switch-handle"></span> 
+      </label>
+    </div>
+    <div class="phone-settings-youtube">
+      <label class="switch-group">
+        <input id="settingsGroupYouTube" class="switch-group-input" type="checkbox" onchange="updatePhoneSettingsUI()" />
+        <span class="switch-group-label" data-on="YouTube" data-off="YouTube"></span> 
+      </label>
+      <label id="settingsYouTubeStreamLabel" class="switch">
+        <input id="settingsYouTubeStream" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+        <span class="switch-label" data-on="YouTubeStream" data-off="YouTubeStream"></span> 
+        <span class="switch-handle"></span> 
+      </label>
+    </div>
+    <div class="phone-settings-twitch">
+      <label class="switch-group">
+        <input id="settingsGroupTwitch" class="switch-group-input" type="checkbox" onchange="updatePhoneSettingsUI()" />
+        <span class="switch-group-label" data-on="Twitch" data-off="Twitch"></span> 
+      </label>
+      <label id="settingsTwitchStreamLabel" class="switch">
+        <input id="settingsTwitchStream" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+        <span class="switch-label" data-on="TwitchStream" data-off="TwitchStream"></span> 
+        <span class="switch-handle"></span> 
+      </label>
+    </div>
+    <div class="phone-settings-webrtc">
+      <label class="switch-group">
+        <input id="settingsGroupWebRtc" class="switch-group-input" type="checkbox" onchange="updatePhoneSettingsUI()" />
+        <span class="switch-group-label" data-on="Web RTC" data-off="Web RTC"></span> 
       </label>
       <label id="settingsDailyStreamWideLabel" class="switch">
-        <input id="settingsDailyStreamWide" class="switch-input" type="checkbox" onchange="settingsWebUserChangedPropertyDailyStreamWide(this)" />
-        <span class="switch-label" data-on="DailyStreamWide - On" data-off="DailyStreamWide - Off"></span> 
+        <input id="settingsDailyStreamWide" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+        <span class="switch-label" data-on="DailyStreamWide" data-off="DailyStreamWide"></span> 
         <span class="switch-handle"></span> 
       </label>
       <label id="settingsDailyStreamUltraLabel" class="switch">
-        <input id="settingsDailyStreamUltra" class="switch-input" type="checkbox" onchange="settingsWebUserChangedPropertyDailyStreamUltra(this)" />
-        <span class="switch-label" data-on="DailyStreamUltra - On" data-off="DailyStreamUltra - Off"></span> 
+        <input id="settingsDailyStreamUltra" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+        <span class="switch-label" data-on="DailyStreamUltra" data-off="DailyStreamUltra"></span> 
         <span class="switch-handle"></span> 
       </label>
       <label id="settingsGameControllerLabel" class="switch">
-        <input id="settingsGameController" class="switch-input" type="checkbox" onchange="settingsWebUserChangedPropertyGameController(this)" />
-        <span class="switch-label" data-on="GameController - On" data-off="GameController - Off"></span> 
+        <input id="settingsGameController" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+        <span class="switch-label" data-on="GameController" data-off="GameController"></span> 
         <span class="switch-handle"></span> 
       </label>
+    </div>
+    <div class="phone-settings-recordingstorage">
+      <label class="switch-group">
+        <input id="settingsGroupTwitch" class="switch-group-input" type="checkbox" onchange="updatePhoneSettingsUI()" />
+        <span class="switch-group-label" data-on="Recording Storage" data-off="Recording Storage"></span> 
+      </label>
+      <!-- storageLocation-->
     </div>
   </div>
 
@@ -268,13 +335,38 @@
     const vUltra   = document.getElementById("vUltra");
     const phWide   = document.getElementById("phWide");
     const phUltra  = document.getElementById("phUltra");
-    const phoneSettingsDailyStreamWideEl = document.getElementById("settingsDailyStreamWide");
-    const phoneSettingsDailyStreamUltraEl = document.getElementById("settingsDailyStreamUltra");
-    const phoneSettingsGameControllerEl = document.getElementById("settingsGameController");
-    const settingsGroupWebRtcEl = document.getElementById("settingsGroupWebRtc");
+
+    const phoneSettingsGroupAppEl = document.getElementById("settingsGroupApp");
+    const phoneSettingsCustomerBuildLabelEl = document.getElementById("settingsCustomerBuildLabel");
+    const phoneSettingsCustomerBuildEl = document.getElementById("settingsCustomerBuild");
+
+    const phoneSettingsGroupCaptureEl = document.getElementById("settingsGroupCapture");
+    const phoneSettingsCaptureWideLabelEl = document.getElementById("settingsCaptureWideLabel");
+    const phoneSettingsCaptureWideEl = document.getElementById("settingsCaptureWide");
+    const phoneSettingsSaveWideLabelEl = document.getElementById("settingsSaveWideLabel");
+    const phoneSettingsSaveWideEl = document.getElementById("settingsSaveWide");
+    const phoneSettingsCaptureUltraLabelEl = document.getElementById("settingsCaptureUltraLabel");
+    const phoneSettingsCaptureUltraEl = document.getElementById("settingsCaptureUltra");
+    const phoneSettingsSaveUltraLabelEl = document.getElementById("settingsSaveUltraLabel");
+    const phoneSettingsSaveUltraEl = document.getElementById("settingsSaveUltra");
+
+    const phoneSettingsGroupYouTubeEl = document.getElementById("settingsGroupYouTube");
+    const phoneSettingsYouTubeStreamLabelEl = document.getElementById("settingsYouTubeStreamLabel");
+    const phoneSettingsYouTubeStreamEl = document.getElementById("settingsYouTubeStream");
+
+    const phoneSettingsGroupTwitchEl = document.getElementById("settingsGroupTwitch");
+    const phoneSettingsTwitchStreamLabelEl = document.getElementById("settingsTwitchStreamLabel");
+    const phoneSettingsTwitchStreamEl = document.getElementById("settingsTwitchStream");
+
+    const phoneSettingsGroupWebRtcEl = document.getElementById("settingsGroupWebRtc");
     const phoneSettingsDailyStreamWideLabelEl = document.getElementById("settingsDailyStreamWideLabel");
     const phoneSettingsDailyStreamUltraLabelEl = document.getElementById("settingsDailyStreamUltraLabel");
     const phoneSettingsGameControllerLabelEl = document.getElementById("settingsGameControllerLabel");
+    const phoneSettingsDailyStreamWideEl = document.getElementById("settingsDailyStreamWide");
+    const phoneSettingsDailyStreamUltraEl = document.getElementById("settingsDailyStreamUltra");
+    const phoneSettingsGameControllerEl = document.getElementById("settingsGameController");
+
+    const phoneSettingsGroupRecordingStorageEl = document.getElementById("settingsGroupRecordingStorage");
 
     // Daily api handle
     var call = null;
@@ -295,28 +387,141 @@
     var phoneSettingsData = {};
     function updatePhoneSettingsUI() {
 
+      // Read settings
+
       let isPhoneConnected = (targetSessionId !== null);
-      let isGameControllerEnabled = isPhoneConnected && "gameController" in phoneSettingsData && phoneSettingsData.gameController;
+
+      let isCustomerBuildEnabled = isPhoneConnected && "customerBuild" in phoneSettingsData && phoneSettingsData.customerBuild;
+
+      let isCaptureWideEnabled = isPhoneConnected && "captureWide" in phoneSettingsData && phoneSettingsData.captureWide;
+      let isSaveWideEnabled = isPhoneConnected && "saveWide" in phoneSettingsData && phoneSettingsData.saveWide;
+      let isCaptureUltraEnabled = isPhoneConnected && "captureUltra" in phoneSettingsData && phoneSettingsData.captureUltra;
+      let isSaveUltraEnabled = isPhoneConnected && "saveUltra" in phoneSettingsData && phoneSettingsData.saveUltra;
+
+      let isYouTubeStreamEnabled = isPhoneConnected && "YouTubeStream" in phoneSettingsData && phoneSettingsData.YouTubeStream;
+
+      let isTwitchStreamEnabled = isPhoneConnected && "TwitchStream" in phoneSettingsData && phoneSettingsData.TwitchStream;
+
       let isDailyStreamWideEnabled = isPhoneConnected && "DailyStreamWide" in phoneSettingsData && phoneSettingsData.DailyStreamWide;
       let isDailyStreamUltraEnabled = isPhoneConnected && "DailyStreamUltra" in phoneSettingsData && phoneSettingsData.DailyStreamUltra;
+      let isGameControllerEnabled = isPhoneConnected && "gameController" in phoneSettingsData && phoneSettingsData.gameController;
+
+      // Update text and controls
 
       if (isPhoneConnected) 
         phoneStatusEl.textContent = "Phone: Connected ✓";
       else
         phoneStatusEl.textContent = "Phone: Disconnected"
+
+      phoneSettingsCustomerBuildEl.disabled = !(isPhoneConnected);
+      let phoneSettingsCustomerBuildCheckedWas = phoneSettingsCustomerBuildEl.checked;
+      phoneSettingsCustomerBuildEl.checked = isCustomerBuildEnabled;
+      
+      phoneSettingsCaptureWideEl.disabled = !(isPhoneConnected);
+      let phoneSettingsCaptureWideCheckedWas = phoneSettingsCaptureWideEl.checked;
+      phoneSettingsCaptureWideEl.checked = isCaptureWideEnabled;
+      phoneSettingsSaveWideEl.disabled = !(isPhoneConnected);
+      let phoneSettingsSaveWideCheckedWas = phoneSettingsSaveWideEl.checked;
+      phoneSettingsSaveWideEl.checked = isSaveWideEnabled;
+      phoneSettingsCaptureUltraEl.disabled = !(isPhoneConnected);
+      let phoneSettingsCaptureUltraCheckedWas = phoneSettingsCaptureUltraEl.checked;
+      phoneSettingsCaptureUltraEl.checked = isCaptureUltraEnabled;
+      phoneSettingsSaveUltraEl.disabled = !(isPhoneConnected);
+      let phoneSettingsSaveUltraCheckedWas = phoneSettingsSaveUltraEl.checked;
+      phoneSettingsSaveUltraEl.checked = isSaveUltraEnabled;
+
+      phoneSettingsYouTubeStreamEl.disabled = !(isPhoneConnected);
+      let phoneSettingsYouTubeStreamCheckedWas = phoneSettingsYouTubeStreamEl.checked;
+      phoneSettingsYouTubeStreamEl.checked = isYouTubeStreamEnabled;
+
+      phoneSettingsTwitchStreamEl.disabled = !(isPhoneConnected);
+      let phoneSettingsTwitchStreamCheckedWas = phoneSettingsTwitchStreamEl.checked;
+      phoneSettingsTwitchStreamEl.checked = isTwitchStreamEnabled;
+
       phoneSettingsDailyStreamWideEl.disabled = !(isPhoneConnected);
+      let phoneSettingsDailyStreamWideCheckedWas = phoneSettingsDailyStreamWideEl.checked;
       phoneSettingsDailyStreamWideEl.checked = isDailyStreamWideEnabled;
       phoneSettingsDailyStreamUltraEl.disabled = !(isPhoneConnected);
+      let phoneSettingsDailyStreamUltraCheckedWas = phoneSettingsDailyStreamUltraEl.checked;
       phoneSettingsDailyStreamUltraEl.checked = isDailyStreamUltraEnabled;
       phoneSettingsGameControllerEl.disabled = !(isPhoneConnected);
+      let phoneSettingsGameControllerCheckedWas = phoneSettingsGameControllerEl.checked;
       phoneSettingsGameControllerEl.checked = isGameControllerEnabled;
-      
-      let displayVal = settingsGroupWebRtcEl.checked ? 'inline-block' : 'none';
+
+      // Logically Toggles groups - any On event will expand a group, any Off event can collapse the group if non are On 
+
+      if (phoneSettingsGroupAppEl.checked) {
+        if (phoneSettingsCustomerBuildCheckedWas && !phoneSettingsCustomerBuildEl.checked)
+          phoneSettingsGroupAppEl.checked = false;
+      } else {
+        if (!phoneSettingsCustomerBuildCheckedWas && phoneSettingsCustomerBuildEl.checked)
+          phoneSettingsGroupAppEl.checked = true;
+      }
+
+      if (phoneSettingsGroupCaptureEl.checked) {
+        if ((phoneSettingsCaptureWideCheckedWas && !phoneSettingsCaptureWideEl.checked)
+          || (phoneSettingsSaveWideCheckedWas && !phoneSettingsSaveWideEl.checked)
+          || (phoneSettingsCaptureUltraCheckedWas && !phoneSettingsCaptureUltraEl.checked)
+          || (phoneSettingsSaveUltraCheckedWas && !phoneSettingsSaveUltraEl.checked))
+          phoneSettingsGroupCaptureEl.checked = phoneSettingsCaptureWideEl.checked || phoneSettingsSaveWideEl.checked || phoneSettingsCaptureUltraEl.checked || phoneSettingsSaveUltraEl.checked;
+      } else {
+        if ((!phoneSettingsCaptureWideCheckedWas && phoneSettingsCaptureWideEl.checked)
+          || (!phoneSettingsSaveWideCheckedWas && phoneSettingsSaveWideEl.checked)
+          || (!phoneSettingsCaptureUltraCheckedWas && phoneSettingsCaptureUltraEl.checked)
+          || (!phoneSettingsSaveUltraCheckedWas && phoneSettingsSaveUltraEl.checked))
+          phoneSettingsGroupCaptureEl.checked = true;
+      }
+
+      if (phoneSettingsGroupYouTubeEl.checked) {
+        if (phoneSettingsYouTubeStreamCheckedWas && !phoneSettingsYouTubeStreamEl.checked)
+          phoneSettingsGroupYouTubeEl.checked = false;
+      } else {
+        if (!phoneSettingsYouTubeStreamCheckedWas && phoneSettingsYouTubeStreamEl.checked)
+          phoneSettingsGroupYouTubeEl.checked = true;
+      }
+
+      if (phoneSettingsGroupTwitchEl.checked) {
+        if (phoneSettingsTwitchStreamCheckedWas && !phoneSettingsTwitchStreamEl.checked)
+          phoneSettingsGroupTwitchEl.checked = false;
+      } else {
+        if (!phoneSettingsTwitchStreamCheckedWas && phoneSettingsTwitchStreamEl.checked)
+          phoneSettingsGroupTwitchEl.checked = true;
+      }
+
+      if (phoneSettingsGroupWebRtcEl.checked) {
+        if ((phoneSettingsDailyStreamWideCheckedWas && !phoneSettingsDailyStreamWideEl.checked)
+          || (phoneSettingsDailyStreamUltraCheckedWas && !phoneSettingsDailyStreamUltraEl.checked)
+          || (phoneSettingsGameControllerCheckedWas && !phoneSettingsGameControllerEl.checked))
+          phoneSettingsGroupWebRtcEl.checked = phoneSettingsDailyStreamWideEl.checked || phoneSettingsDailyStreamUltraEl.checked || phoneSettingsGameControllerEl.checked;
+      } else {
+        if ((!phoneSettingsDailyStreamWideCheckedWas && phoneSettingsDailyStreamWideEl.checked)
+          || (!phoneSettingsDailyStreamUltraCheckedWas && phoneSettingsDailyStreamUltraEl.checked)
+          || (!phoneSettingsGameControllerCheckedWas && phoneSettingsGameControllerEl.checked))
+          phoneSettingsGroupWebRtcEl.checked = true;
+      }
+
+      // Visually Toggles groups
+
+      let displayValApp = phoneSettingsGroupAppEl.checked ? 'inline-block' : 'none';
+      phoneSettingsCustomerBuildLabelEl.style.display = displayValApp;
+
+      let displayValCapture = phoneSettingsGroupCaptureEl.checked ? 'inline-block' : 'none';
+      phoneSettingsCaptureWideLabelEl.style.display = displayValCapture;
+      phoneSettingsSaveWideLabelEl.style.display = displayValCapture;
+      phoneSettingsCaptureUltraLabelEl.style.display = displayValCapture;
+      phoneSettingsSaveUltraLabelEl.style.display = displayValCapture;
+
+      let displayValYouTube = phoneSettingsGroupYouTubeEl.checked ? 'inline-block' : 'none';
+      phoneSettingsYouTubeStreamLabelEl.style.display = displayValYouTube;
+
+      let displayValTwitch = phoneSettingsGroupTwitchEl.checked ? 'inline-block' : 'none';
+      phoneSettingsTwitchStreamLabelEl.style.display = displayValTwitch;
+
+      let displayVal = phoneSettingsGroupWebRtcEl.checked ? 'inline-block' : 'none';
       phoneSettingsDailyStreamWideLabelEl.style.display = displayVal;
       phoneSettingsDailyStreamUltraLabelEl.style.display = displayVal;
       phoneSettingsGameControllerLabelEl.style.display = displayVal;      
     }
-    settingsGroupWebRtcEl.checked = true;
     updatePhoneSettingsUI();
 
 
@@ -383,25 +588,26 @@
         updatePhoneSettingsUI();
     }
     function settingsWebUserGroupToggle(obj) {
-      updatePhoneSettingsUI();    
+      updatePhoneSettingsUI();
     }
-    function settingsWebUserChangedPropertyDailyStreamWide(obj) {
-      if ("gameController" in phoneSettingsData) {
-        phoneSettingsData.DailyStreamWide = obj.checked;
-        settingsDataSendToPhone();
+    function settingsWebUserChangedProperty(obj) {
+      switch(obj.id) {
+        case phoneSettingsCustomerBuildEl.id: phoneSettingsData.customerBuild = obj.checked; break;
+
+        case phoneSettingsCaptureWideEl.id: phoneSettingsData.captureWide = obj.checked; break;
+        case phoneSettingsSaveWideEl.id: phoneSettingsData.saveWide = obj.checked; break;
+        case phoneSettingsCaptureUltraEl.id: phoneSettingsData.captureUltra = obj.checked; break;
+        case phoneSettingsSaveUltraEl.id: phoneSettingsData.saveUltra = obj.checked; break;
+
+        case phoneSettingsYouTubeStreamEl.id: phoneSettingsData.YouTubeStream = obj.checked; break;
+
+        case phoneSettingsTwitchStreamEl.id: phoneSettingsData.TwitchStream = obj.checked; break;
+
+        case phoneSettingsDailyStreamWideEl.id: phoneSettingsData.DailyStreamWide = obj.checked; break;
+        case phoneSettingsDailyStreamUltraEl.id: phoneSettingsData.DailyStreamUltra = obj.checked; break;
+        case phoneSettingsGameControllerEl.id: phoneSettingsData.gameController = obj.checked; break;
       }
-    }
-    function settingsWebUserChangedPropertyDailyStreamUltra(obj) {
-      if ("gameController" in phoneSettingsData) {
-        phoneSettingsData.DailyStreamUltra = obj.checked;
-        settingsDataSendToPhone();
-      }
-    }
-    function settingsWebUserChangedPropertyGameController(obj) {
-      if ("gameController" in phoneSettingsData) {
-        phoneSettingsData.gameController = obj.checked;
-        settingsDataSendToPhone();
-      }
+      settingsDataSendToPhone();
     }
     function settingsDataSendToPhone() {
       if (call) call.sendAppMessage(phoneSettingsData, '*');
