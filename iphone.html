@@ -638,6 +638,7 @@
 
       if (!targetSessionId) { // && (p.tracks?.wide || p.tracks?.ultraWide)) {
         targetSessionId = p.session_id;
+        console.log("maybeAttachFor: starting session [targetSessionId=" + targetSessionId + "]");
       }
       if (p.session_id !== targetSessionId) return;
 
@@ -694,6 +695,27 @@
     function settingsDataRequestLatestFromPhone() {
       if (call) call.sendAppMessage({ "settingsRequestLatest" : true }, '*');
     }
+    function refReplacer() {
+      let m = new Map(), v= new Map(), init = null;
+
+      // in TypeScript add "this: any" param to avoid compliation errors - as follows
+      //    return function (this: any, field: any, value: any) {
+      return function(field, value) {
+        let p= m.get(this) + (Array.isArray(this) ? `[${field}]` : '.' + field); 
+        let isComplex= value===Object(value)
+        
+        if (isComplex) m.set(value, p);  
+        
+        let pp = v.get(value)||'';
+        let path = p.replace(/undefined\.\.?/,'');
+        let val = pp ? `#REF:${pp[0]=='[' ? '$':'$.'}${pp}` : value;
+        
+        !init ? (init=value) : (val===init ? val="#REF:$" : 0);
+        if(!pp && isComplex) v.set(value, path);
+      
+        return val;
+      }
+    }
     call
       .on("joining-meeting", () => {
         browserStatusEl.textContent = "Browser: Joining room…";
@@ -708,18 +730,33 @@
         detachAll(); 
         updatePhoneSettingsUI();
       })
-      .on("error", e => { browserStatusEl.textContent = "Browser: Error! " + (e?.errorMsg || e?.message || e); console.log("call-instance-destroyed: e=" + e)})
-      .on("call-instance-destroyed", e => console.log("call-instance-destroyed: e=" + e))
+      .on("error", ev => { browserStatusEl.textContent = "Browser: Error! " + (ev?.errorMsg || ev?.message || ev); console.log("error: ev=" + JSON.stringify(ev, refReplacer())); })
+      .on("call-instance-destroyed", ev => console.log("call-instance-destroyed: ev=" + JSON.stringify(ev, refReplacer())))
       .on("participant-joined",  ev => {
-        maybeAttachFor(ev.participant);
-        updatePhoneSettingsUI();
-      })
-      .on("participant-updated", ev => maybeAttachFor(ev.participant))
-      .on("participant-left",    ev => {
-        if (ev?.participant?.session_id === targetSessionId) {
+        console.log("participant-joined: ev=" + JSON.stringify(ev, refReplacer()));
+        if(targetSessionId) {
+          console.log("participant-joined: kicking current session [targetSessionId=" + targetSessionId + "]");
           targetSessionId = null;
           phoneSettingsData = {};
           detachAll();
+          updatePhoneSettingsUI();
+        }
+        maybeAttachFor(ev.participant);
+        updatePhoneSettingsUI();
+      })
+      .on("participant-updated", ev => {
+        //console.log("participant-updated: ev=" + JSON.stringify(ev, refReplacer()));
+        maybeAttachFor(ev.participant);
+      })
+      .on("participant-left",    ev => {
+        console.log("participant-left: ev=" + JSON.stringify(ev, refReplacer()));
+        if (ev?.participant?.session_id === targetSessionId) {
+          console.log("participant-left: stopping current session [targetSessionId=" + targetSessionId + "]");
+          targetSessionId = null;
+          phoneSettingsData = {};
+          detachAll();
+        } else {
+          console.log("participant-left: disregarding non-current session [id=" + ev?.participant?.session_id + ", targetSessionId=" + targetSessionId + "]");
         }
         updatePhoneSettingsUI();
       })
