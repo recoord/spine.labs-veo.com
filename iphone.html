@@ -708,7 +708,8 @@
         detachAll(); 
         updatePhoneSettingsUI();
       })
-      .on("error", e => browserStatusEl.textContent = "Browser: Error! " + (e?.errorMsg || e?.message || e))
+      .on("error", e => { browserStatusEl.textContent = "Browser: Error! " + (e?.errorMsg || e?.message || e); console.log("call-instance-destroyed: e=" + e)})
+      .on("call-instance-destroyed", e => console.log("call-instance-destroyed: e=" + e))
       .on("participant-joined",  ev => {
         maybeAttachFor(ev.participant);
         updatePhoneSettingsUI();
