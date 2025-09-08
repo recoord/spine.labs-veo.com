@@ -440,8 +440,10 @@
       let isSaveUltraEnabled = isPhoneConnected && "saveUltra" in phoneSettingsData && phoneSettingsData.saveUltra;
 
       let isYouTubeStreamEnabled = isPhoneConnected && "YouTubeStream" in phoneSettingsData && phoneSettingsData.YouTubeStream;
+      let YouTubeStreamKeyIsValid = isPhoneConnected && "YouTubeStreamKeyIsValid" in phoneSettingsData && phoneSettingsData.YouTubeStreamKeyIsValid;
 
       let isTwitchStreamEnabled = isPhoneConnected && "TwitchStream" in phoneSettingsData && phoneSettingsData.TwitchStream;
+      let TwitchStreamKeyIsValid = isPhoneConnected && "TwitchStreamKeyIsValid" in phoneSettingsData && phoneSettingsData.TwitchStreamKeyIsValid;
 
       let isDailyStreamWideEnabled = isPhoneConnected && "DailyStreamWide" in phoneSettingsData && phoneSettingsData.DailyStreamWide;
       let isDailyStreamUltraEnabled = isPhoneConnected && "DailyStreamUltra" in phoneSettingsData && phoneSettingsData.DailyStreamUltra;
@@ -477,11 +479,11 @@
       let phoneSettingsSaveUltraCheckedWas = phoneSettingsSaveUltraEl.checked;
       phoneSettingsSaveUltraEl.checked = isSaveUltraEnabled;
 
-      phoneSettingsYouTubeStreamEl.disabled = !(isPhoneConnected && isCaptureWideEnabled);
+      phoneSettingsYouTubeStreamEl.disabled = !(isPhoneConnected && isCaptureWideEnabled && YouTubeStreamKeyIsValid);
       let phoneSettingsYouTubeStreamCheckedWas = phoneSettingsYouTubeStreamEl.checked;
       phoneSettingsYouTubeStreamEl.checked = isYouTubeStreamEnabled;
 
-      phoneSettingsTwitchStreamEl.disabled = !(isPhoneConnected && isCaptureWideEnabled);
+      phoneSettingsTwitchStreamEl.disabled = !(isPhoneConnected && isCaptureWideEnabled && TwitchStreamKeyIsValid);
       let phoneSettingsTwitchStreamCheckedWas = phoneSettingsTwitchStreamEl.checked;
       phoneSettingsTwitchStreamEl.checked = isTwitchStreamEnabled;
 
