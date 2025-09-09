@@ -457,6 +457,7 @@
     gamePadData_changesCallback = onGamePadDataChange;
 
     var phoneSettingsData = {};
+    var phoneMetricsData = [];
     function updatePhoneSettingsUI() {
 
       // Read settings
@@ -650,7 +651,78 @@
       phoneSettingsExternalStorageLabelEl.style.display = displayValRecordingStorage;
       phoneSettingsCloudStorageLabelEl.style.display = displayValRecordingStorage;
     }
+    function updatePhoneMetricsUI() {
+
+      // Assign the specification to a local variable vlSpec.
+      var vlSpec = {
+/*
+        "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
+        "description": "A bar chart that directly encodes color names in the data.",
+        "data": {
+          "values": [
+            {
+              "color": "red",
+              "b": 28
+            },
+            {
+              "color": "green",
+              "b": 55
+            },
+            {
+              "color": "blue",
+              "b": 43
+            }
+          ]
+        },
+        "mark": "bar",
+        "encoding": {
+          "x": {
+            "field": "color",
+            "type": "nominal"
+          },
+          "y": {
+            "field": "b",
+            "type": "quantitative"
+          },
+          "color": {
+            "field": "color",
+            "type": "nominal",
+            "scale": null
+          }
+        }
+  */      
+        "$schema": 'https://vega.github.io/schema/vega-lite/v6.json',
+        "data": {
+          "values": phoneMetricsData
+/*
+          [
+            {"x": '2003', "y": 2, "color": "red"},
+            {"x": '2004', "y": 7, "color": "red"},
+            {"x": '2005', "y": 4, "color": "red"},
+            {"x": '2006', "y": 1, "color": "red"},
+            {"x": '2007', "y": 2, "color": "red"},
+            {"x": '2008', "y": 6, "color": "red"},
+            {"x": '2009', "y": 8, "color": "red"},
+            {"x": '2010', "y": 4, "color": "red"},
+          ],
+*/
+        },
+        "mark": 'line',
+        "encoding": {
+          "x": { "field": 'time', "type": 'temporal'},
+          "y": {"field": 'fps', "type": 'quantitative'},
+          "color": {"field": "metric", "type": "nominal"}
+        },
+
+      };
+
+      // Embed the visualization in the container with id `vis`
+      vegaEmbed('#phone-metrics-placeholder', vlSpec);
+
+    }
+
     updatePhoneSettingsUI();
+    updatePhoneMetricsUI();
 
     if (!roomName) {
       browserStatusEl.textContent = "Browser: Error! no room name (?name=…)";
@@ -711,9 +783,27 @@
     function handleAppMessage(ev) {
         //console.log("handleAppMessage: ev=" + ev)
         if (ev && ev.data) {
-          phoneSettingsData = ev.data;
+          if (ev.data.kind && ev.data.kind == 'Metrics') {
+            var entry1 = {
+              'time': new Date(ev.data.time_utc),
+              'fps': ev.data.fpsWide,
+              'metric': 'Wide',
+            };
+            var entry2 = {
+              'time': new Date(ev.data.time_utc),
+              'fps': ev.data.fpsUltra,
+              'metric': 'Ultra',
+            };
+            phoneMetricsData.push(entry1);
+            phoneMetricsData.push(entry2);
+            
+            updatePhoneMetricsUI();
+          } else {
+            phoneSettingsData = ev.data;
+
+            updatePhoneSettingsUI();
+          }
         }
-        updatePhoneSettingsUI();
     }
     function settingsWebUserGroupToggle(obj) {
       updatePhoneSettingsUI();
@@ -830,40 +920,6 @@
     }).catch(err => {
       browserStatusEl.textContent = "Error: " + (err?.errorMsg || err?.message || err);
     });
-
-
-    // Assign the specification to a local variable vlSpec.
-    var vlSpec = {
-      $schema: 'https://vega.github.io/schema/vega-lite/v6.json',
-      data: {
-        values: [
-          {a: 'C', b: 2},
-          {a: 'C', b: 7},
-          {a: 'C', b: 4},
-          {a: 'D', b: 1},
-          {a: 'D', b: 2},
-          {a: 'D', b: 6},
-          {a: 'E', b: 8},
-          {a: 'E', b: 4},
-          {a: 'E', b: 7},
-        ],
-      },
-      mark: 'bar',
-      encoding: {
-        y: {field: 'a', type: 'nominal'},
-        x: {
-          aggregate: 'average',
-          field: 'b',
-          type: 'quantitative',
-          axis: {
-            title: 'Average of b',
-          },
-        },
-      },
-    };
-
-    // Embed the visualization in the container with id `vis`
-    vegaEmbed('#phone-metrics-placeholder', vlSpec);
 
   </script>
 </body>
