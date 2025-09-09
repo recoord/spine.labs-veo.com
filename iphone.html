@@ -5,7 +5,16 @@
   <title>iPhone camera viewer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://unpkg.com/@daily-co/daily-js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega@6.1.2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@6.2.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@7.0.2"></script>
   <script type="text/javascript" src="gamecontrollers.js"></script>
+  <style media="screen">
+      /* Add space between Vega-Embed links  */
+      .vega-actions a {
+        margin-right: 5px;
+      }
+  </style>
   <style>
     html,body{margin:0;height:100%;background:#000;color:#fff;font-family:sans-serif}
     #status{
@@ -250,121 +259,131 @@
     </div>
   </div>
 
-  <div id="phone-settings-container"">
-    <div class="phone-settings-app">
-      <label class="switch-group">
-        <input id="settingsGroupApp" class="switch-group-input" type="checkbox" onchange="updatePhoneSettingsUI()" />
-        <span class="switch-group-label" data-on="App" data-off="App"></span> 
-      </label>
-      <label id="settingsCustomerBuildLabel" class="switch">
-        <input id="settingsCustomerBuild" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
-        <span class="switch-label" data-on="customerBuild" data-off="customerBuild"></span> 
-        <span class="switch-handle"></span> 
-      </label>
-    </div>
-    <div class="phone-settings-ai">
-      <label class="switch-group">
-        <input id="settingsGroupAI" class="switch-group-input" type="checkbox" onchange="updatePhoneSettingsUI()" />
-        <span class="switch-group-label" data-on="AI" data-off="AI"></span> 
-      </label>
-      <label id="settingsOverlayEnableAILabel" class="switch">
-        <input id="settingsOverlayEnableAI" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
-        <span class="switch-label" data-on="overlayEnableAI" data-off="overlayEnableAI"></span> 
-        <span class="switch-handle"></span> 
-      </label>
-    </div>
-    <div class="phone-settings-capture">
-      <label class="switch-group">
-        <input id="settingsGroupCapture" class="switch-group-input" type="checkbox" onchange="updatePhoneSettingsUI()" />
-        <span class="switch-group-label" data-on="Capture" data-off="Capture"></span> 
-      </label>
-      <label id="settingsCaptureWideLabel" class="switch">
-        <input id="settingsCaptureWide" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
-        <span class="switch-label" data-on="captureWide" data-off="captureWide"></span> 
-        <span class="switch-handle"></span> 
-      </label>
-      <label id="settingsSaveWideLabel" class="switch">
-        <input id="settingsSaveWide" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
-        <span class="switch-label" data-on="saveWide" data-off="saveWide"></span> 
-        <span class="switch-handle"></span> 
-      </label>
-      <label id="settingsCaptureUltraLabel" class="switch">
-        <input id="settingsCaptureUltra" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
-        <span class="switch-label" data-on="captureUltra" data-off="captureUltra"></span> 
-        <span class="switch-handle"></span> 
-      </label>
-      <label id="settingsSaveUltraLabel" class="switch">
-        <input id="settingsSaveUltra" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
-        <span class="switch-label" data-on="saveUltra" data-off="saveUltra"></span> 
-        <span class="switch-handle"></span> 
-      </label>
-    </div>
-    <div class="phone-settings-youtube">
-      <label class="switch-group">
-        <input id="settingsGroupYouTube" class="switch-group-input" type="checkbox" onchange="updatePhoneSettingsUI()" />
-        <span class="switch-group-label" data-on="YouTube" data-off="YouTube"></span> 
-      </label>
-      <label id="settingsYouTubeStreamLabel" class="switch">
-        <input id="settingsYouTubeStream" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
-        <span class="switch-label" data-on="YouTubeStream" data-off="YouTubeStream"></span> 
-        <span class="switch-handle"></span> 
-      </label>
-    </div>
-    <div class="phone-settings-twitch">
-      <label class="switch-group">
-        <input id="settingsGroupTwitch" class="switch-group-input" type="checkbox" onchange="updatePhoneSettingsUI()" />
-        <span class="switch-group-label" data-on="Twitch" data-off="Twitch"></span> 
-      </label>
-      <label id="settingsTwitchStreamLabel" class="switch">
-        <input id="settingsTwitchStream" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
-        <span class="switch-label" data-on="TwitchStream" data-off="TwitchStream"></span> 
-        <span class="switch-handle"></span> 
-      </label>
-    </div>
-    <div class="phone-settings-webrtc">
-      <label class="switch-group">
-        <input id="settingsGroupWebRtc" class="switch-group-input" type="checkbox" onchange="updatePhoneSettingsUI()" />
-        <span class="switch-group-label" data-on="Web RTC" data-off="Web RTC"></span> 
-      </label>
-      <label id="settingsDailyStreamWideLabel" class="switch">
-        <input id="settingsDailyStreamWide" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
-        <span class="switch-label" data-on="DailyStreamWide" data-off="DailyStreamWide"></span> 
-        <span class="switch-handle"></span> 
-      </label>
-      <label id="settingsDailyStreamUltraLabel" class="switch">
-        <input id="settingsDailyStreamUltra" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
-        <span class="switch-label" data-on="DailyStreamUltra" data-off="DailyStreamUltra"></span> 
-        <span class="switch-handle"></span> 
-      </label>
-      <label id="settingsGameControllerLabel" class="switch">
-        <input id="settingsGameController" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
-        <span class="switch-label" data-on="GameController" data-off="GameController"></span> 
-        <span class="switch-handle"></span> 
-      </label>
-    </div>
-    <div class="phone-settings-recordingstorage">
-      <label class="switch-group">
-        <input id="settingsGroupRecordingStorage" class="switch-group-input" type="checkbox" onchange="updatePhoneSettingsUI()" />
-        <span class="switch-group-label" data-on="Recording Storage" data-off="Recording Storage"></span> 
-      </label>
-      <label id="settingsInternalStorageLabel" class="switch">
-        <input id="settingsInternalStorage" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
-        <span class="switch-label" data-on="InternalStorage" data-off="InternalStorage"></span> 
-        <span class="switch-handle"></span> 
-      </label>
-      <label id="settingsExternalStorageLabel" class="switch">
-        <input id="settingsExternalStorage" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
-        <span class="switch-label" data-on="ExternalStorage" data-off="ExternalStorage"></span> 
-        <span class="switch-handle"></span> 
-      </label>
-      <label id="settingsCloudStorageLabel" class="switch">
-        <input id="settingsCloudStorage" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
-        <span class="switch-label" data-on="CloudStorage" data-off="CloudStorage"></span> 
-        <span class="switch-handle"></span> 
-      </label>
+  <div id="video-container">
 
+    <div id="phone-metrics-container" class="video-wrap">
+      <div id="phone-metrics-placeholder">
+
+      </div>
     </div>
-    <div id="phone-settings-version">Settings Version: ?</div>
+
+    <div id="phone-settings-container" class="video-wrap">
+      <div class="phone-settings-app">
+        <label class="switch-group">
+          <input id="settingsGroupApp" class="switch-group-input" type="checkbox" onchange="updatePhoneSettingsUI()" />
+          <span class="switch-group-label" data-on="App" data-off="App"></span> 
+        </label>
+        <label id="settingsCustomerBuildLabel" class="switch">
+          <input id="settingsCustomerBuild" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+          <span class="switch-label" data-on="customerBuild" data-off="customerBuild"></span> 
+          <span class="switch-handle"></span> 
+        </label>
+      </div>
+      <div class="phone-settings-ai">
+        <label class="switch-group">
+          <input id="settingsGroupAI" class="switch-group-input" type="checkbox" onchange="updatePhoneSettingsUI()" />
+          <span class="switch-group-label" data-on="AI" data-off="AI"></span> 
+        </label>
+        <label id="settingsOverlayEnableAILabel" class="switch">
+          <input id="settingsOverlayEnableAI" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+          <span class="switch-label" data-on="overlayEnableAI" data-off="overlayEnableAI"></span> 
+          <span class="switch-handle"></span> 
+        </label>
+      </div>
+      <div class="phone-settings-capture">
+        <label class="switch-group">
+          <input id="settingsGroupCapture" class="switch-group-input" type="checkbox" onchange="updatePhoneSettingsUI()" />
+          <span class="switch-group-label" data-on="Capture" data-off="Capture"></span> 
+        </label>
+        <label id="settingsCaptureWideLabel" class="switch">
+          <input id="settingsCaptureWide" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+          <span class="switch-label" data-on="captureWide" data-off="captureWide"></span> 
+          <span class="switch-handle"></span> 
+        </label>
+        <label id="settingsSaveWideLabel" class="switch">
+          <input id="settingsSaveWide" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+          <span class="switch-label" data-on="saveWide" data-off="saveWide"></span> 
+          <span class="switch-handle"></span> 
+        </label>
+        <label id="settingsCaptureUltraLabel" class="switch">
+          <input id="settingsCaptureUltra" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+          <span class="switch-label" data-on="captureUltra" data-off="captureUltra"></span> 
+          <span class="switch-handle"></span> 
+        </label>
+        <label id="settingsSaveUltraLabel" class="switch">
+          <input id="settingsSaveUltra" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+          <span class="switch-label" data-on="saveUltra" data-off="saveUltra"></span> 
+          <span class="switch-handle"></span> 
+        </label>
+      </div>
+      <div class="phone-settings-youtube">
+        <label class="switch-group">
+          <input id="settingsGroupYouTube" class="switch-group-input" type="checkbox" onchange="updatePhoneSettingsUI()" />
+          <span class="switch-group-label" data-on="YouTube" data-off="YouTube"></span> 
+        </label>
+        <label id="settingsYouTubeStreamLabel" class="switch">
+          <input id="settingsYouTubeStream" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+          <span class="switch-label" data-on="YouTubeStream" data-off="YouTubeStream"></span> 
+          <span class="switch-handle"></span> 
+        </label>
+      </div>
+      <div class="phone-settings-twitch">
+        <label class="switch-group">
+          <input id="settingsGroupTwitch" class="switch-group-input" type="checkbox" onchange="updatePhoneSettingsUI()" />
+          <span class="switch-group-label" data-on="Twitch" data-off="Twitch"></span> 
+        </label>
+        <label id="settingsTwitchStreamLabel" class="switch">
+          <input id="settingsTwitchStream" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+          <span class="switch-label" data-on="TwitchStream" data-off="TwitchStream"></span> 
+          <span class="switch-handle"></span> 
+        </label>
+      </div>
+      <div class="phone-settings-webrtc">
+        <label class="switch-group">
+          <input id="settingsGroupWebRtc" class="switch-group-input" type="checkbox" onchange="updatePhoneSettingsUI()" />
+          <span class="switch-group-label" data-on="Web RTC" data-off="Web RTC"></span> 
+        </label>
+        <label id="settingsDailyStreamWideLabel" class="switch">
+          <input id="settingsDailyStreamWide" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+          <span class="switch-label" data-on="DailyStreamWide" data-off="DailyStreamWide"></span> 
+          <span class="switch-handle"></span> 
+        </label>
+        <label id="settingsDailyStreamUltraLabel" class="switch">
+          <input id="settingsDailyStreamUltra" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+          <span class="switch-label" data-on="DailyStreamUltra" data-off="DailyStreamUltra"></span> 
+          <span class="switch-handle"></span> 
+        </label>
+        <label id="settingsGameControllerLabel" class="switch">
+          <input id="settingsGameController" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+          <span class="switch-label" data-on="GameController" data-off="GameController"></span> 
+          <span class="switch-handle"></span> 
+        </label>
+      </div>
+      <div class="phone-settings-recordingstorage">
+        <label class="switch-group">
+          <input id="settingsGroupRecordingStorage" class="switch-group-input" type="checkbox" onchange="updatePhoneSettingsUI()" />
+          <span class="switch-group-label" data-on="Recording Storage" data-off="Recording Storage"></span> 
+        </label>
+        <label id="settingsInternalStorageLabel" class="switch">
+          <input id="settingsInternalStorage" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+          <span class="switch-label" data-on="InternalStorage" data-off="InternalStorage"></span> 
+          <span class="switch-handle"></span> 
+        </label>
+        <label id="settingsExternalStorageLabel" class="switch">
+          <input id="settingsExternalStorage" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+          <span class="switch-label" data-on="ExternalStorage" data-off="ExternalStorage"></span> 
+          <span class="switch-handle"></span> 
+        </label>
+        <label id="settingsCloudStorageLabel" class="switch">
+          <input id="settingsCloudStorage" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+          <span class="switch-label" data-on="CloudStorage" data-off="CloudStorage"></span> 
+          <span class="switch-handle"></span> 
+        </label>
+
+      </div>
+      <div id="phone-settings-version">Settings Version: ?</div>
+    </div>
+
   </div>
 
   <script>
@@ -633,7 +652,6 @@
     }
     updatePhoneSettingsUI();
 
-
     if (!roomName) {
       browserStatusEl.textContent = "Browser: Error! no room name (?name=…)";
       throw new Error("Missing ?name param");
@@ -812,6 +830,40 @@
     }).catch(err => {
       browserStatusEl.textContent = "Error: " + (err?.errorMsg || err?.message || err);
     });
+
+
+    // Assign the specification to a local variable vlSpec.
+    var vlSpec = {
+      $schema: 'https://vega.github.io/schema/vega-lite/v6.json',
+      data: {
+        values: [
+          {a: 'C', b: 2},
+          {a: 'C', b: 7},
+          {a: 'C', b: 4},
+          {a: 'D', b: 1},
+          {a: 'D', b: 2},
+          {a: 'D', b: 6},
+          {a: 'E', b: 8},
+          {a: 'E', b: 4},
+          {a: 'E', b: 7},
+        ],
+      },
+      mark: 'bar',
+      encoding: {
+        y: {field: 'a', type: 'nominal'},
+        x: {
+          aggregate: 'average',
+          field: 'b',
+          type: 'quantitative',
+          axis: {
+            title: 'Average of b',
+          },
+        },
+      },
+    };
+
+    // Embed the visualization in the container with id `vis`
+    vegaEmbed('#phone-metrics-placeholder', vlSpec);
 
   </script>
 </body>
