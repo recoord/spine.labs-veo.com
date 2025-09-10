@@ -735,6 +735,11 @@
         //console.log("handleAppMessage: ev=" + ev)
         if (ev && ev.data) {
           if (ev.data.kind && ev.data.kind == 'Metrics') {
+            var entry0 = {
+              'time': new Date(ev.data.time_utc),
+              'value': ev.data.zoomFactorWide !== null ? 100.0*ev.data.zoomFactorWide : nil,
+              'metric': 'zoomFactorWide [%]',
+            };
             var entry1 = {
               'time': new Date(ev.data.time_utc),
               'value': ev.data.fpsWide,
@@ -750,6 +755,8 @@
               'value': ev.data.dockkitBatteryPercentage,
               'metric': 'dockkitBattery [%]',
             };
+            
+            phoneMetricsData.push(entry0);
             phoneMetricsData.push(entry1);
             phoneMetricsData.push(entry2);
             phoneMetricsData.push(entry3);
