@@ -263,12 +263,27 @@
 
     <div id="phone-metrics-container" class="video-wrap">
       <div id="phone-metrics-placeholder">
-
+      </div>
+      <div id="phone-metrics-plotting">
+        <label class="switch-group">
+          <input id="metricsGroupMetrics" class="switch-group-input" type="checkbox" onchange="updatePhoneMetricsUI()" />
+          <span class="switch-group-label" data-on="Metrics" data-off="Metrics"></span> 
+        </label>
+        <label id="phoneMetricsDrawToggleLabel" class="switch">
+          <input id="phoneMetricsDrawToggle" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+          <span class="switch-label" data-on="Plotting" data-off="Paused"></span> 
+          <span class="switch-handle"></span> 
+        </label>
+        <label id="phoneMetricsClearLabel" class="switch">
+          <input id="phoneMetricsClear" class="switch-group-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+          <span class="switch-group-label" data-on="Clear" data-off="Clear"></span> 
+        </label>
       </div>
     </div>
 
+
     <div id="phone-settings-container" class="video-wrap">
-      <div class="phone-settings-app">
+      <div id="phone-settings-app">
         <label class="switch-group">
           <input id="settingsGroupApp" class="switch-group-input" type="checkbox" onchange="updatePhoneSettingsUI()" />
           <span class="switch-group-label" data-on="App" data-off="App"></span> 
@@ -279,7 +294,7 @@
           <span class="switch-handle"></span> 
         </label>
       </div>
-      <div class="phone-settings-ai">
+      <div id="phone-settings-ai">
         <label class="switch-group">
           <input id="settingsGroupAI" class="switch-group-input" type="checkbox" onchange="updatePhoneSettingsUI()" />
           <span class="switch-group-label" data-on="AI" data-off="AI"></span> 
@@ -290,7 +305,7 @@
           <span class="switch-handle"></span> 
         </label>
       </div>
-      <div class="phone-settings-capture">
+      <div id="phone-settings-capture">
         <label class="switch-group">
           <input id="settingsGroupCapture" class="switch-group-input" type="checkbox" onchange="updatePhoneSettingsUI()" />
           <span class="switch-group-label" data-on="Capture" data-off="Capture"></span> 
@@ -316,7 +331,7 @@
           <span class="switch-handle"></span> 
         </label>
       </div>
-      <div class="phone-settings-youtube">
+      <div id="phone-settings-youtube">
         <label class="switch-group">
           <input id="settingsGroupYouTube" class="switch-group-input" type="checkbox" onchange="updatePhoneSettingsUI()" />
           <span class="switch-group-label" data-on="YouTube" data-off="YouTube"></span> 
@@ -327,7 +342,7 @@
           <span class="switch-handle"></span> 
         </label>
       </div>
-      <div class="phone-settings-twitch">
+      <div id="phone-settings-twitch">
         <label class="switch-group">
           <input id="settingsGroupTwitch" class="switch-group-input" type="checkbox" onchange="updatePhoneSettingsUI()" />
           <span class="switch-group-label" data-on="Twitch" data-off="Twitch"></span> 
@@ -338,7 +353,7 @@
           <span class="switch-handle"></span> 
         </label>
       </div>
-      <div class="phone-settings-webrtc">
+      <div id="phone-settings-webrtc">
         <label class="switch-group">
           <input id="settingsGroupWebRtc" class="switch-group-input" type="checkbox" onchange="updatePhoneSettingsUI()" />
           <span class="switch-group-label" data-on="Web RTC" data-off="Web RTC"></span> 
@@ -359,7 +374,7 @@
           <span class="switch-handle"></span> 
         </label>
       </div>
-      <div class="phone-settings-recordingstorage">
+      <div id="phone-settings-recordingstorage">
         <label class="switch-group">
           <input id="settingsGroupRecordingStorage" class="switch-group-input" type="checkbox" onchange="updatePhoneSettingsUI()" />
           <span class="switch-group-label" data-on="Recording Storage" data-off="Recording Storage"></span> 
@@ -395,6 +410,13 @@
     const vUltra   = document.getElementById("vUltra");
     const phWide   = document.getElementById("phWide");
     const phUltra  = document.getElementById("phUltra");
+
+
+    const phoneMetricsGroupMetricsEl = document.getElementById("metricsGroupMetrics");
+    const phoneMetricsDrawToggleLabelEl = document.getElementById("phoneMetricsDrawToggleLabel");
+    const phoneMetricsDrawToggleEl = document.getElementById("phoneMetricsDrawToggle");
+    const phoneMetricsClearLabelEl = document.getElementById("phoneMetricsClearLabel");
+
 
     const phoneSettingsVersionEl = document.getElementById("phone-settings-version");
 
@@ -439,6 +461,9 @@
     const phoneSettingsInternalStorageEl = document.getElementById("settingsInternalStorage");
     const phoneSettingsExternalStorageEl = document.getElementById("settingsExternalStorage");
     const phoneSettingsCloudStorageEl = document.getElementById("settingsCloudStorage");
+
+
+
 
     // Daily api handle
     var call = null;
@@ -651,29 +676,48 @@
       phoneSettingsExternalStorageLabelEl.style.display = displayValRecordingStorage;
       phoneSettingsCloudStorageLabelEl.style.display = displayValRecordingStorage;
     }
-    function updatePhoneMetricsUI() {
+    function updatePhoneMetricsUI(forceUpdate) {
 
-      // Assign the specification to a local variable vlSpec.
-      var vlSpec = {
-        "$schema": 'https://vega.github.io/schema/vega-lite/v6.json',
-        "data": {
-          "values": phoneMetricsData
-        },
-        "mark": 'line',
-        "encoding": {
-          "x": { "field": 'time', "type": 'temporal'},
-          "y": {"field": 'value', "type": 'quantitative'},
-          "color": {"field": "metric", "type": "nominal"}
-        },
-      };
+      if(phoneMetricsDrawToggle.checked || forceUpdate) {
+        // Assign the specification to a local variable vlSpec.
+        var vlSpec = {
+          "$schema": 'https://vega.github.io/schema/vega-lite/v6.json',
+          "data": {
+            "values": phoneMetricsData
+          },
+          "mark": 'line',
+          "encoding": {
+            "x": { "field": 'time', "type": 'temporal'},
+            "y": {"field": 'value', "type": 'quantitative'},
+            "color": {"field": "metric", "type": "nominal"}
+          },
+        };
 
-      // Embed the visualization in the container with id `vis`
-      vegaEmbed('#phone-metrics-placeholder', vlSpec);
+        // Embed the visualization in the container with id `vis`
+        vegaEmbed('#phone-metrics-placeholder', vlSpec);
+      }
 
+
+      // Logically Toggles groups - any On event will expand a group, any Off event can collapse the group if non are On 
+/*
+      if (phoneMetricsGroupPlottingEl.checked) {
+        phoneMetricsGroupPlottingEl.checked = true;
+      } else {
+        phoneMetricsGroupPlottingEl.checked = false;
+      }
+*/
+      // Visually Toggles groups
+
+      let displayValMetrics = phoneMetricsGroupMetricsEl.checked ? 'inline-block' : 'none';
+      phoneMetricsDrawToggleLabelEl.style.display = displayValMetrics;
+      phoneMetricsClearLabelEl.style.display = displayValMetrics;
     }
 
     updatePhoneSettingsUI();
-    updatePhoneMetricsUI();
+    phoneMetricsGroupMetricsEl.checked = true;
+    phoneMetricsDrawToggle.checked = true;
+    phoneMetricsClear.checked = false;
+    updatePhoneMetricsUI(true);
 
     if (!roomName) {
       browserStatusEl.textContent = "Browser: Error! no room name (?name=…)";
@@ -761,6 +805,7 @@
             phoneMetricsData.push(entry2);
             phoneMetricsData.push(entry3);
             
+            phoneMetricsClear.checked = true;
             updatePhoneMetricsUI();
           } else {
             phoneSettingsData = ev.data;
@@ -773,7 +818,10 @@
       updatePhoneSettingsUI();
     }
     function settingsWebUserChangedProperty(obj) {
+      var sendSettingsDataToPhone = true;
       switch(obj.id) {
+        case phoneMetricsClear.id: phoneMetricsData = []; obj.check = false; updatePhoneMetricsUI(true); sendSettingsDataToPhone = false; break;
+
         case phoneSettingsCustomerBuildEl.id: phoneSettingsData.customerBuild = obj.checked; break;
 
         case phoneSettingsOverlayEnableAIEl.id: phoneSettingsData.overlayEnableAI = obj.checked; break;
@@ -795,7 +843,9 @@
         case phoneSettingsExternalStorageEl.id: if (obj.checked) phoneSettingsData.storageLocation = "externalStorage"; break;
         case phoneSettingsCloudStorageEl.id: if (obj.checked) phoneSettingsData.storageLocation = "cloudStorage"; break;
       }
-      settingsDataSendToPhone();
+      if (sendSettingsDataToPhone) {
+        settingsDataSendToPhone();
+      }
     }
     function settingsDataSendToPhone() {
       if (call) call.sendAppMessage(phoneSettingsData, '*');
