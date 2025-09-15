@@ -685,7 +685,10 @@
           "data": {
             "values": phoneMetricsData
           },
-          "mark": 'line',
+          "mark": {
+            "type": "line",
+            "point": true
+          },
           "encoding": {
             "x": { "field": 'time', "type": 'temporal'},
             "y": {"field": 'value', "type": 'quantitative'},
@@ -799,11 +802,47 @@
               'value': ev.data.dockkitBatteryPercentage,
               'metric': 'dockkitBattery [%]',
             };
+            var entry4 = {
+              'time': new Date(ev.data.time_utc),
+              'value': ev.data.pitchDegrees,
+              'metric': 'pitch [°]',
+            };
+            var entry5 = {
+              'time': new Date(ev.data.time_utc),
+              'value': ev.data.yawDegrees,
+              'metric': 'yaw [°]',
+            };
+            var entry6 = {
+              'time': new Date(ev.data.time_utc),
+              'value': ev.data.rollDegrees,
+              'metric': 'roll [°]',
+            };
+            var entry7 = {
+              'time': new Date(ev.data.time_utc),
+              'value': ev.data.pitchDegreesPerSecs,
+              'metric': 'pitch vel. [°/s]',
+            };
+            var entry8 = {
+              'time': new Date(ev.data.time_utc),
+              'value': ev.data.yawDegreesPerSecs,
+              'metric': 'yaw vel. [°/s]',
+            };
+            var entry9 = {
+              'time': new Date(ev.data.time_utc),
+              'value': ev.data.rollDegreesPerSecs,
+              'metric': 'roll vel. [°/s]',
+            };
             
             phoneMetricsData.push(entry0);
             phoneMetricsData.push(entry1);
             phoneMetricsData.push(entry2);
             phoneMetricsData.push(entry3);
+            phoneMetricsData.push(entry4);
+            phoneMetricsData.push(entry5);
+            phoneMetricsData.push(entry6);
+            phoneMetricsData.push(entry7);
+            phoneMetricsData.push(entry8);
+            phoneMetricsData.push(entry9);
             
             phoneMetricsClear.checked = true;
             updatePhoneMetricsUI();
