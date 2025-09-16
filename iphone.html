@@ -72,7 +72,7 @@
       position: relative;
       display: block;
       height: inherit;
-      font-size: 10px;
+      font-size: 9px;
       text-transform: uppercase;
       background: #eceeef;
       border-radius: inherit;
@@ -143,7 +143,7 @@
       position: relative;
       display: block;
       height: inherit;
-      font-size: 10px;
+      font-size: 7px;
       text-transform: uppercase;
       background: #eceeef;
       border-radius: inherit;
@@ -264,10 +264,10 @@
     <div id="phone-metrics-container" class="video-wrap">
       <div id="phone-metrics-placeholder">
       </div>
-      <div id="phone-metrics-plotting">
+      <div id="phone-metrics-plot">
         <label class="switch-group">
-          <input id="metricsGroupMetrics" class="switch-group-input" type="checkbox" onchange="updatePhoneMetricsUI()" />
-          <span class="switch-group-label" data-on="Metrics" data-off="Metrics"></span> 
+          <input id="metricsGroupPlot" class="switch-group-input" type="checkbox" onchange="updatePhoneMetricsUI()" />
+          <span class="switch-group-label" data-on="Plot" data-off="Plot"></span> 
         </label>
         <label id="phoneMetricsDrawToggleLabel" class="switch">
           <input id="phoneMetricsDrawToggle" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
@@ -276,7 +276,69 @@
         </label>
         <label id="phoneMetricsClearLabel" class="switch">
           <input id="phoneMetricsClear" class="switch-group-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
-          <span class="switch-group-label" data-on="Clear" data-off="Clear"></span> 
+          <span class="switch-label" data-on="Clear" data-off="Clear"></span> 
+        </label>
+      </div>
+
+      <div id="phone-metrics-series">
+        <label class="switch-group">
+          <input id="metricsGroupSeries" class="switch-group-input" type="checkbox" onchange="updatePhoneMetricsUI()" />
+          <span class="switch-group-label" data-on="Series" data-off="Series"></span> 
+        </label>
+
+        <label id="phoneMetricsToggleFpsWideLabel" class="switch">
+          <input id="phoneMetricsToggleFpsWide" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+          <span class="switch-label" data-on="fpsWide - On" data-off="fpsWide - Off"></span> 
+          <span class="switch-handle"></span> 
+        </label>
+        <label id="phoneMetricsToggleFpsUltraLabel" class="switch">
+          <input id="phoneMetricsToggleFpsUltra" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+          <span class="switch-label" data-on="fpsUltra - On" data-off="fpsUltra - Off"></span> 
+          <span class="switch-handle"></span> 
+        </label>
+
+        <label id="phoneMetricsToggleZoomFactorWideLabel" class="switch">
+          <input id="phoneMetricsToggleZoomFactorWide" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+          <span class="switch-label" data-on="zoomFactorWide - On" data-off="zoomFactorWide - Off"></span> 
+          <span class="switch-handle"></span> 
+        </label>
+
+        <label id="phoneMetricsToggleDockkitBatteryPercentageLabel" class="switch">
+          <input id="phoneMetricsToggleDockkitBatteryPercentage" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+          <span class="switch-label" data-on="dockkitBatteryPercentage - On" data-off="dockkitBatteryPercentage - Off"></span> 
+          <span class="switch-handle"></span> 
+        </label>
+
+        <label id="phoneMetricsTogglePitchDegreesLabel" class="switch">
+          <input id="phoneMetricsTogglePitchDegrees" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+          <span class="switch-label" data-on="pitchDegrees - On" data-off="pitchDegrees - Off"></span> 
+          <span class="switch-handle"></span> 
+        </label>
+        <label id="phoneMetricsToggleYawDegreesLabel" class="switch">
+          <input id="phoneMetricsToggleYawDegrees" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+          <span class="switch-label" data-on="yawDegrees - On" data-off="yawDegrees - Off"></span> 
+          <span class="switch-handle"></span> 
+        </label>
+        <label id="phoneMetricsToggleRollDegreesLabel" class="switch">
+          <input id="phoneMetricsToggleRollDegrees" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+          <span class="switch-label" data-on="rollDegrees - On" data-off="rollDegrees - Off"></span> 
+          <span class="switch-handle"></span> 
+        </label>
+
+        <label id="phoneMetricsTogglePitchDegreesPerSecsLabel" class="switch">
+          <input id="phoneMetricsTogglePitchDegreesPerSecs" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+          <span class="switch-label" data-on="pitchDegreesPerSecs - On" data-off="pitchDegreesPerSecs - Off"></span> 
+          <span class="switch-handle"></span> 
+        </label>
+        <label id="phoneMetricsToggleYawDegreesPerSecsLabel" class="switch">
+          <input id="phoneMetricsToggleYawDegreesPerSecs" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+          <span class="switch-label" data-on="yawDegreesPerSecs - On" data-off="yawDegreesPerSecs - Off"></span> 
+          <span class="switch-handle"></span> 
+        </label>
+        <label id="phoneMetricsToggleRollDegreesPerSecsLabel" class="switch">
+          <input id="phoneMetricsToggleRollDegreesPerSecs" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+          <span class="switch-label" data-on="rollDegreesPerSecs - On" data-off="rollDegreesPerSecs - Off"></span> 
+          <span class="switch-handle"></span> 
         </label>
       </div>
     </div>
@@ -412,10 +474,32 @@
     const phUltra  = document.getElementById("phUltra");
 
 
-    const phoneMetricsGroupMetricsEl = document.getElementById("metricsGroupMetrics");
+    const phoneMetricsGroupPlotEl = document.getElementById("metricsGroupPlot");
     const phoneMetricsDrawToggleLabelEl = document.getElementById("phoneMetricsDrawToggleLabel");
     const phoneMetricsDrawToggleEl = document.getElementById("phoneMetricsDrawToggle");
     const phoneMetricsClearLabelEl = document.getElementById("phoneMetricsClearLabel");
+
+    const phoneMetricsGroupSeriesEl = document.getElementById("metricsGroupSeries");
+    const phoneMetricsToggleFpsWideLabelEl = document.getElementById("phoneMetricsToggleFpsWideLabel")
+    const phoneMetricsToggleFpsWideEl = document.getElementById("phoneMetricsToggleFpsWide")
+    const phoneMetricsToggleFpsUltraLabelEl = document.getElementById("phoneMetricsToggleFpsUltraLabel")
+    const phoneMetricsToggleFpsUltraEl = document.getElementById("phoneMetricsToggleFpsUltra")
+    const phoneMetricsToogleZoomFactorWideLabelEl = document.getElementById("phoneMetricsToggleZoomFactorWideLabel")
+    const phoneMetricsToggleZoomFactorWideEl = document.getElementById("phoneMetricsToggleZoomFactorWide")
+    const phoneMetricsToogleDockkitBatteryPercentageLabelEl = document.getElementById("phoneMetricsToggleDockkitBatteryPercentageLabel")
+    const phoneMetricsToggleDockkitBatteryPercentageEl = document.getElementById("phoneMetricsToggleDockkitBatteryPercentage")
+    const phoneMetricsTogglePitchDegreesLabelEl = document.getElementById("phoneMetricsTogglePitchDegreesLabel")
+    const phoneMetricsTogglePitchDegreesEl = document.getElementById("phoneMetricsTogglePitchDegrees")
+    const phoneMetricsToggleYawDegreesLabelEl = document.getElementById("phoneMetricsToggleYawDegreesLabel")
+    const phoneMetricsToggleYawDegreesEl = document.getElementById("phoneMetricsToggleYawDegrees")
+    const phoneMetricsToggleRollDegreesLabelEl = document.getElementById("phoneMetricsToggleRollDegreesLabel")
+    const phoneMetricsToggleRollDegreesEl = document.getElementById("phoneMetricsToggleRollDegrees")
+    const phoneMetricsTogglePitchDegreesPerSecsLabelEl = document.getElementById("phoneMetricsTogglePitchDegreesPerSecsLabel")
+    const phoneMetricsTogglePitchDegreesPerSecsEl = document.getElementById("phoneMetricsTogglePitchDegreesPerSecs")
+    const phoneMetricsToggleYawDegreesPerSecsLabelEl = document.getElementById("phoneMetricsToggleYawDegreesPerSecsLabel")
+    const phoneMetricsToggleYawDegreesPerSecsEl = document.getElementById("phoneMetricsToggleYawDegreesPerSecs")
+    const phoneMetricsToggleRollDegreesPerSecsLabelEl = document.getElementById("phoneMetricsToggleRollDegreesPerSecsLabel")
+    const phoneMetricsToggleRollDegreesPerSecsEl = document.getElementById("phoneMetricsToggleRollDegreesPerSecs")
 
 
     const phoneSettingsVersionEl = document.getElementById("phone-settings-version");
@@ -482,7 +566,72 @@
     gamePadData_changesCallback = onGamePadDataChange;
 
     var phoneSettingsData = {};
+    
     var phoneMetricsData = [];
+    function phoneMetricsDataClear() {
+      phoneMetricsData = [];
+    };
+    function phoneMetricsDataAdd(data, indexOfLast) {
+      for(var i = 0; i < data.length; i++) {
+        var entry = data[i];
+        if (indexOfLast !== undefined && indexOfLast == entry.index) 
+          break;
+        phoneMetricsData.push(entry);
+      }
+    };
+    phoneMetricsDataClear();
+
+    var phoneMetricsDataAll = {};
+    function phoneMetricsDataAllClear() {
+
+      phoneMetricsDataAll = {
+        'fpsWide' : {
+          'enabled' : true,
+          'data' : []
+        },
+        'fpsUltra' : {
+          'enabled' : true,
+          'data' : []
+        },
+        'zoomFactorWide' : {
+          'enabled' : true,
+          'data' : []
+        },
+        'dockkitBatteryPercentage' : {
+          'enabled' : true,
+          'data' : []
+        },
+        'pitchDegrees' : {
+          'enabled' : true,
+          'data' : []
+        },
+        'yawDegrees' : {
+          'enabled' : true,
+          'data' : []
+        },
+        'rollDegrees' : {
+          'enabled' : true,
+          'data' : []
+        },
+        'pitchDegreesPerSecs' : {
+          'enabled' : true,
+          'data' : []
+        },
+        'yawDegreesPerSecs' : {
+          'enabled' : true,
+          'data' : []
+        },
+        'rollDegreesPerSecs' : {
+          'enabled' : true,
+          'data' : []
+        }       
+
+      };
+
+    };
+    phoneMetricsDataAllClear();
+    var phoneMetricsDataAllIndexOfLast = 0;
+    
     function updatePhoneSettingsUI() {
 
       // Read settings
@@ -678,6 +827,74 @@
     }
     function updatePhoneMetricsUI(forceUpdate) {
 
+      // Clear data used by graph and rebuild it
+
+      if (forceUpdate) {
+        phoneMetricsDataClear();
+
+        if (phoneMetricsDataAll.fpsWide.enabled) {
+          phoneMetricsDataAdd(phoneMetricsDataAll.fpsWide.data, phoneMetricsDataAllIndexOfLast);
+        }
+        if (phoneMetricsDataAll.fpsUltra.enabled) {
+          phoneMetricsDataAdd(phoneMetricsDataAll.fpsUltra.data, phoneMetricsDataAllIndexOfLast);
+        }
+
+        if (phoneMetricsDataAll.zoomFactorWide.enabled) {
+          phoneMetricsDataAdd(phoneMetricsDataAll.zoomFactorWide.data, phoneMetricsDataAllIndexOfLast);
+        }
+
+        if (phoneMetricsDataAll.dockkitBatteryPercentage.enabled) {
+          phoneMetricsDataAdd(phoneMetricsDataAll.dockkitBatteryPercentage.data, phoneMetricsDataAllIndexOfLast);
+        }
+
+        if (phoneMetricsDataAll.pitchDegrees.enabled) {
+          phoneMetricsDataAdd(phoneMetricsDataAll.pitchDegrees.data, phoneMetricsDataAllIndexOfLast);
+        }
+        if (phoneMetricsDataAll.yawDegrees.enabled) {
+          phoneMetricsDataAdd(phoneMetricsDataAll.yawDegrees.data, phoneMetricsDataAllIndexOfLast);
+        }
+        if (phoneMetricsDataAll.rollDegrees.enabled) {
+          phoneMetricsDataAdd(phoneMetricsDataAll.rollDegrees.data, phoneMetricsDataAllIndexOfLast);
+        }
+
+        if (phoneMetricsDataAll.pitchDegreesPerSecs.enabled) {
+          phoneMetricsDataAdd(phoneMetricsDataAll.pitchDegreesPerSecs.data, phoneMetricsDataAllIndexOfLast);
+        }
+        if (phoneMetricsDataAll.yawDegreesPerSecs.enabled) {
+          phoneMetricsDataAdd(phoneMetricsDataAll.yawDegreesPerSecs.data, phoneMetricsDataAllIndexOfLast);
+        }
+        if (phoneMetricsDataAll.rollDegreesPerSecs.enabled) {
+          phoneMetricsDataAdd(phoneMetricsDataAll.rollDegreesPerSecs.data, phoneMetricsDataAllIndexOfLast);
+        }
+      }
+
+      let displayValPlot = phoneMetricsGroupPlotEl.checked ? 'inline-block' : 'none';
+      phoneMetricsDrawToggleLabelEl.style.display = displayValPlot;
+      phoneMetricsClearLabelEl.style.display = displayValPlot;
+
+      let displayValSeries = phoneMetricsGroupSeriesEl.checked ? 'inline-block' : 'none';
+      phoneMetricsToggleFpsWideLabelEl.style.display = displayValSeries;
+      phoneMetricsToggleFpsUltraLabelEl.style.display = displayValSeries;
+      phoneMetricsToogleZoomFactorWideLabelEl.style.display = displayValSeries;
+      phoneMetricsToogleDockkitBatteryPercentageLabelEl.style.display = displayValSeries;
+      phoneMetricsTogglePitchDegreesLabelEl.style.display = displayValSeries;
+      phoneMetricsToggleYawDegreesLabelEl.style.display = displayValSeries;
+      phoneMetricsToggleRollDegreesLabelEl.style.display = displayValSeries;
+      phoneMetricsTogglePitchDegreesPerSecsLabelEl.style.display = displayValSeries;
+      phoneMetricsToggleYawDegreesPerSecsLabelEl.style.display = displayValSeries;
+      phoneMetricsToggleRollDegreesPerSecsLabelEl.style.display = displayValSeries;
+
+      phoneMetricsToggleFpsWideEl.checked = phoneMetricsDataAll.fpsWide.enabled;
+      phoneMetricsToggleFpsUltraEl.checked = phoneMetricsDataAll.fpsUltra.enabled;
+      phoneMetricsToggleZoomFactorWideEl.checked = phoneMetricsDataAll.zoomFactorWide.enabled;
+      phoneMetricsToggleDockkitBatteryPercentageEl.checked = phoneMetricsDataAll.dockkitBatteryPercentage.enabled;
+      phoneMetricsTogglePitchDegreesEl.checked = phoneMetricsDataAll.pitchDegrees.enabled;
+      phoneMetricsToggleYawDegreesEl.checked = phoneMetricsDataAll.yawDegrees.enabled;
+      phoneMetricsToggleRollDegreesEl.checked = phoneMetricsDataAll.rollDegrees.enabled;
+      phoneMetricsTogglePitchDegreesPerSecsEl.checked = phoneMetricsDataAll.pitchDegreesPerSecs.enabled;
+      phoneMetricsToggleYawDegreesPerSecsEl.checked = phoneMetricsDataAll.yawDegreesPerSecs.enabled;
+      phoneMetricsToggleRollDegreesPerSecsEl.checked = phoneMetricsDataAll.rollDegreesPerSecs.enabled;
+
       if(phoneMetricsDrawToggle.checked || forceUpdate) {
         // Assign the specification to a local variable vlSpec.
         var vlSpec = {
@@ -719,24 +936,10 @@
         vegaEmbed('#phone-metrics-placeholder', vlSpec);
       }
 
-
-      // Logically Toggles groups - any On event will expand a group, any Off event can collapse the group if non are On 
-/*
-      if (phoneMetricsGroupPlottingEl.checked) {
-        phoneMetricsGroupPlottingEl.checked = true;
-      } else {
-        phoneMetricsGroupPlottingEl.checked = false;
-      }
-*/
-      // Visually Toggles groups
-
-      let displayValMetrics = phoneMetricsGroupMetricsEl.checked ? 'inline-block' : 'none';
-      phoneMetricsDrawToggleLabelEl.style.display = displayValMetrics;
-      phoneMetricsClearLabelEl.style.display = displayValMetrics;
     }
 
     updatePhoneSettingsUI();
-    phoneMetricsGroupMetricsEl.checked = true;
+    phoneMetricsGroupPlotEl.checked = true;
     phoneMetricsDrawToggle.checked = true;
     phoneMetricsClear.checked = false;
     updatePhoneMetricsUI(true);
@@ -802,66 +1005,112 @@
         if (ev && ev.data) {
           if (ev.data.kind && ev.data.kind == 'Metrics') {
             var entry0 = {
+              'index': ev.data.index,
               'time': new Date(ev.data.time_utc),
               'value': ev.data.zoomFactorWide !== null ? 100.0*ev.data.zoomFactorWide : nil,
               'metric': 'zoomFactorWide [%]',
             };
             var entry1 = {
+              'index': ev.data.index,
               'time': new Date(ev.data.time_utc),
-              'value': ev.data.fpsWide,
+              'value': ev.data.fpsWide !== undefined ? ev.data.fpsWide : null,
               'metric': 'fpsWide [frames/sec]',
             };
             var entry2 = {
+              'index': ev.data.index,
               'time': new Date(ev.data.time_utc),
-              'value': ev.data.fpsUltra,
+              'value': ev.data.fpsUltra !== undefined ? ev.data.fpsUltra : null,
               'metric': 'fpsUltra [frames/sec]',
             };
             var entry3 = {
+              'index': ev.data.index,
               'time': new Date(ev.data.time_utc),
-              'value': ev.data.dockkitBatteryPercentage,
+              'value': ev.data.dockkitBatteryPercentage !== undefined ? ev.data.dockkitBatteryPercentage : null,
               'metric': 'dockkitBattery [%]',
             };
             var entry4 = {
+              'index': ev.data.index,
               'time': new Date(ev.data.time_utc),
-              'value': ev.data.pitchDegrees,
+              'value': ev.data.pitchDegrees !== undefined ? ev.data.pitchDegrees : null,
               'metric': 'pitch [°]',
             };
             var entry5 = {
+              'index': ev.data.index,
               'time': new Date(ev.data.time_utc),
-              'value': ev.data.yawDegrees,
+              'value': ev.data.yawDegrees !== undefined ? ev.data.yawDegrees : null,
               'metric': 'yaw [°]',
             };
             var entry6 = {
+              'index': ev.data.index,
               'time': new Date(ev.data.time_utc),
-              'value': ev.data.rollDegrees,
+              'value': ev.data.rollDegrees !== undefined ? ev.data.rollDegrees : null,
               'metric': 'roll [°]',
             };
             var entry7 = {
+              'index': ev.data.index,
               'time': new Date(ev.data.time_utc),
-              'value': ev.data.pitchDegreesPerSecs,
+              'value': ev.data.pitchDegreesPerSecs !== undefined ? ev.data.pitchDegreesPerSecs : null,
               'metric': 'pitch vel. [°/s]',
             };
             var entry8 = {
+              'index': ev.data.index,
               'time': new Date(ev.data.time_utc),
-              'value': ev.data.yawDegreesPerSecs,
+              'value': ev.data.yawDegreesPerSecs !== undefined ? ev.data.yawDegreesPerSecs : null,
               'metric': 'yaw vel. [°/s]',
             };
             var entry9 = {
+              'index': ev.data.index,
               'time': new Date(ev.data.time_utc),
-              'value': ev.data.rollDegreesPerSecs,
+              'value': ev.data.rollDegreesPerSecs !== undefined ? ev.data.rollDegreesPerSecs : null,
               'metric': 'roll vel. [°/s]',
             };
             
-            phoneMetricsData.push(entry0);
-            phoneMetricsData.push(entry1);
-            phoneMetricsData.push(entry2);
-            phoneMetricsData.push(entry3);
-            phoneMetricsData.push(entry4);
-            phoneMetricsData.push(entry5);
-            phoneMetricsData.push(entry6);
-            phoneMetricsData.push(entry7);
-            phoneMetricsData.push(entry8);
-            phoneMetricsData.push(entry9);
+            phoneMetricsDataAll.zoomFactorWide.data.push(entry0);
+            phoneMetricsDataAll.fpsWide.data.push(entry1);
+            phoneMetricsDataAll.fpsUltra.data.push(entry2);
+            phoneMetricsDataAll.dockkitBatteryPercentage.data.push(entry3);
+            phoneMetricsDataAll.pitchDegrees.data.push(entry4);
+            phoneMetricsDataAll.yawDegrees.data.push(entry5);
+            phoneMetricsDataAll.rollDegrees.data.push(entry6);
+            phoneMetricsDataAll.pitchDegreesPerSecs.data.push(entry7);
+            phoneMetricsDataAll.yawDegreesPerSecs.data.push(entry8);
+            phoneMetricsDataAll.rollDegreesPerSecs.data.push(entry9);
+
+            if (phoneMetricsDrawToggleEl.checked) {
+              if (phoneMetricsDataAll.zoomFactorWide.enabled) {
+                phoneMetricsData.push(entry0);
+              }
+              if (phoneMetricsDataAll.fpsWide.enabled) {
+                phoneMetricsData.push(entry1);
+              }
+              if (phoneMetricsDataAll.fpsUltra.enabled) {
+                phoneMetricsData.push(entry2);
+              }
+              if (phoneMetricsDataAll.dockkitBatteryPercentage.enabled) {
+                phoneMetricsData.push(entry3);
+              }
+              if (phoneMetricsDataAll.pitchDegrees.enabled) {
+                phoneMetricsData.push(entry4);
+              }
+              if (phoneMetricsDataAll.yawDegrees.enabled) {
+                phoneMetricsData.push(entry5);
+              }
+              if (phoneMetricsDataAll.rollDegrees.enabled) {
+                phoneMetricsData.push(entry6);
+              }
+              if (phoneMetricsDataAll.pitchDegreesPerSecs.enabled) {
+                phoneMetricsData.push(entry7);
+              }
+              if (phoneMetricsDataAll.yawDegreesPerSecs.enabled) {
+                phoneMetricsData.push(entry8);
+              }
+              if (phoneMetricsDataAll.rollDegreesPerSecs.enabled) {
+                phoneMetricsData.push(entry9);
+              }
+            }
+
+            if(phoneMetricsDrawToggleEl.checked)
+              phoneMetricsDataAllIndexOfLast = ev.data.index;
             
             phoneMetricsClear.checked = true;
             updatePhoneMetricsUI();
@@ -876,33 +1125,40 @@
       updatePhoneSettingsUI();
     }
     function settingsWebUserChangedProperty(obj) {
-      var sendSettingsDataToPhone = true;
       switch(obj.id) {
-        case phoneMetricsClear.id: phoneMetricsData = []; obj.check = false; updatePhoneMetricsUI(true); sendSettingsDataToPhone = false; break;
+        case phoneMetricsClear.id: phoneMetricsDataClear(); phoneMetricsDataAllClear(); obj.checked = false; updatePhoneMetricsUI(true); break;
+        case phoneMetricsDrawToggle.id: if (obj.checked) updatePhoneMetricsUI(true); break;
+        case phoneMetricsToggleFpsWideEl.id: phoneMetricsDataAll.fpsWide.enabled = obj.checked; updatePhoneMetricsUI(true); break;
+        case phoneMetricsToggleFpsUltraEl.id: phoneMetricsDataAll.fpsUltra.enabled = obj.checked; updatePhoneMetricsUI(true); break;
+        case phoneMetricsToggleZoomFactorWideEl.id: phoneMetricsDataAll.zoomFactorWide.enabled = obj.checked; updatePhoneMetricsUI(true); break;
+        case phoneMetricsToggleDockkitBatteryPercentageEl.id: phoneMetricsDataAll.dockkitBatteryPercentage.enabled = obj.checked; updatePhoneMetricsUI(true); break;
+        case phoneMetricsTogglePitchDegreesEl.id: phoneMetricsDataAll.pitchDegrees.enabled = obj.checked; updatePhoneMetricsUI(true); break;
+        case phoneMetricsToggleYawDegreesEl.id: phoneMetricsDataAll.yawDegrees.enabled = obj.checked; updatePhoneMetricsUI(true); break;
+        case phoneMetricsToggleRollDegreesEl.id: phoneMetricsDataAll.rollDegrees.enabled = obj.checked; updatePhoneMetricsUI(true); break;
+        case phoneMetricsTogglePitchDegreesPerSecsEl.id: phoneMetricsDataAll.pitchDegreesPerSecs.enabled = obj.checked; updatePhoneMetricsUI(true); break;
+        case phoneMetricsToggleYawDegreesPerSecsEl.id: phoneMetricsDataAll.yawDegreesPerSecs.enabled = obj.checked; updatePhoneMetricsUI(true); break;
+        case phoneMetricsToggleRollDegreesPerSecsEl.id: phoneMetricsDataAll.rollDegreesPerSecs.enabled = obj.checked; updatePhoneMetricsUI(true); break;
 
-        case phoneSettingsCustomerBuildEl.id: phoneSettingsData.customerBuild = obj.checked; break;
+        case phoneSettingsCustomerBuildEl.id: phoneSettingsData.customerBuild = obj.checked; settingsDataSendToPhone(); break;
 
-        case phoneSettingsOverlayEnableAIEl.id: phoneSettingsData.overlayEnableAI = obj.checked; break;
+        case phoneSettingsOverlayEnableAIEl.id: phoneSettingsData.overlayEnableAI = obj.checked; settingsDataSendToPhone(); break;
 
-        case phoneSettingsCaptureWideEl.id: phoneSettingsData.captureWide = obj.checked; break;
-        case phoneSettingsSaveWideEl.id: phoneSettingsData.saveWide = obj.checked; break;
-        case phoneSettingsCaptureUltraEl.id: phoneSettingsData.captureUltra = obj.checked; break;
-        case phoneSettingsSaveUltraEl.id: phoneSettingsData.saveUltra = obj.checked; break;
+        case phoneSettingsCaptureWideEl.id: phoneSettingsData.captureWide = obj.checked; settingsDataSendToPhone(); break;
+        case phoneSettingsSaveWideEl.id: phoneSettingsData.saveWide = obj.checked; settingsDataSendToPhone(); break;
+        case phoneSettingsCaptureUltraEl.id: phoneSettingsData.captureUltra = obj.checked; settingsDataSendToPhone(); break;
+        case phoneSettingsSaveUltraEl.id: phoneSettingsData.saveUltra = obj.checked; settingsDataSendToPhone(); break;
 
-        case phoneSettingsYouTubeStreamEl.id: phoneSettingsData.YouTubeStream = obj.checked; break;
+        case phoneSettingsYouTubeStreamEl.id: phoneSettingsData.YouTubeStream = obj.checked; settingsDataSendToPhone(); break;
 
-        case phoneSettingsTwitchStreamEl.id: phoneSettingsData.TwitchStream = obj.checked; break;
+        case phoneSettingsTwitchStreamEl.id: phoneSettingsData.TwitchStream = obj.checked; settingsDataSendToPhone(); break;
 
-        case phoneSettingsDailyStreamWideEl.id: phoneSettingsData.DailyStreamWide = obj.checked; break;
-        case phoneSettingsDailyStreamUltraEl.id: phoneSettingsData.DailyStreamUltra = obj.checked; break;
-        case phoneSettingsGameControllerEl.id: phoneSettingsData.gameController = obj.checked; break;
+        case phoneSettingsDailyStreamWideEl.id: phoneSettingsData.DailyStreamWide = obj.checked; settingsDataSendToPhone(); break;
+        case phoneSettingsDailyStreamUltraEl.id: phoneSettingsData.DailyStreamUltra = obj.checked; settingsDataSendToPhone(); break;
+        case phoneSettingsGameControllerEl.id: phoneSettingsData.gameController = obj.checked; settingsDataSendToPhone(); break;
 
-        case phoneSettingsInternalStorageEl.id: if (obj.checked) phoneSettingsData.storageLocation = "internalStorage"; break;
-        case phoneSettingsExternalStorageEl.id: if (obj.checked) phoneSettingsData.storageLocation = "externalStorage"; break;
-        case phoneSettingsCloudStorageEl.id: if (obj.checked) phoneSettingsData.storageLocation = "cloudStorage"; break;
-      }
-      if (sendSettingsDataToPhone) {
-        settingsDataSendToPhone();
+        case phoneSettingsInternalStorageEl.id: if (obj.checked) phoneSettingsData.storageLocation = "internalStorage"; settingsDataSendToPhone(); break;
+        case phoneSettingsExternalStorageEl.id: if (obj.checked) phoneSettingsData.storageLocation = "externalStorage"; settingsDataSendToPhone(); break;
+        case phoneSettingsCloudStorageEl.id: if (obj.checked) phoneSettingsData.storageLocation = "cloudStorage"; settingsDataSendToPhone(); break;
       }
     }
     function settingsDataSendToPhone() {
