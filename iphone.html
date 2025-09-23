@@ -1045,6 +1045,7 @@
     }
 
     function phoneMetricsDataAllOptimize() {
+      const phoneMetricsDataAllOptimize_debug = false;
       const maxLength = 12;
       var array_parent_ref = [
         phoneMetricsDataAll.fpsWide,
@@ -1076,7 +1077,9 @@
           }
           delete a_p.data;
           a_p.data = a_n;
-          console.log("phoneMetricsDataAllOptimize: a_p_i=" + a_p_i + ", a_p.data.length=" + a_p.data.length + ", start_index=" + start_index + ", half_length=" + half_length + ", a_n.length=" + a_n.length);
+          
+          if (phoneMetricsDataAllOptimize_debug) 
+            console.log("phoneMetricsDataAllOptimize: a_p_i=" + a_p_i + ", a_p.data.length=" + a_p.data.length + ", start_index=" + start_index + ", half_length=" + half_length + ", a_n.length=" + a_n.length);
         }
       }
 
