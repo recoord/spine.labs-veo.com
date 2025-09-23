@@ -1005,7 +1005,7 @@
         // Cleanup leaked vega lite event handlers
         while (0 < vegaLiteListeners.length) {
           var listener = vegaLiteListeners.pop();
-          listener.target.removeEventListener(listener.type, listener.fn);
+          document.removeEventListener(listener.type, listener.fn);
         }
         // Embed the visualization in the container with id `vis`
         vegaEmbed('#phone-metrics-placeholder', vegaLiteMetricsChartObject);
