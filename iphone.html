@@ -578,6 +578,7 @@
     
     var phoneMetricsData = [];
     function phoneMetricsDataClear() {
+      delete phoneMetricsData;
       phoneMetricsData = [];
     };
     function phoneMetricsDataAdd(data, indexOfLast) {
@@ -592,6 +593,31 @@
 
     var phoneMetricsDataAll = {};
     function phoneMetricsDataAllClear() {
+
+      if (phoneMetricsDataAll) {
+        if (phoneMetricsDataAll.fpsWide && phoneMetricsDataAll.fpsWide.data) 
+          delete phoneMetricsDataAll.fpsWide.data;
+        if (phoneMetricsDataAll.fpsUltra && phoneMetricsDataAll.fpsUltra.data) 
+          delete phoneMetricsDataAll.fpsUltra.data;
+        if (phoneMetricsDataAll.thermalState && phoneMetricsDataAll.thermalState.data) 
+          delete phoneMetricsDataAll.thermalState.data;
+        if (phoneMetricsDataAll.dockkitBatteryPercentage && phoneMetricsDataAll.dockkitBatteryPercentage.data) 
+          delete phoneMetricsDataAll.dockkitBatteryPercentage.data;
+        if (phoneMetricsDataAll.pitchDegrees && phoneMetricsDataAll.pitchDegrees.data) 
+          delete phoneMetricsDataAll.pitchDegrees.data;
+        if (phoneMetricsDataAll.yawDegrees && phoneMetricsDataAll.yawDegrees.data) 
+          delete phoneMetricsDataAll.yawDegrees.data;
+        if (phoneMetricsDataAll.rollDegrees && phoneMetricsDataAll.rollDegrees.data) 
+          delete phoneMetricsDataAll.rollDegrees.data;
+        if (phoneMetricsDataAll.pitchDegreesPerSecs && phoneMetricsDataAll.pitchDegreesPerSecs.data) 
+          delete phoneMetricsDataAll.pitchDegreesPerSecs.data;
+        if (phoneMetricsDataAll.yawDegreesPerSecs && phoneMetricsDataAll.yawDegreesPerSecs.data) 
+          delete phoneMetricsDataAll.yawDegreesPerSecs.data;
+        if (phoneMetricsDataAll.rollDegreesPerSecs && phoneMetricsDataAll.rollDegreesPerSecs.data) 
+          delete phoneMetricsDataAll.rollDegreesPerSecs.data;
+        if (phoneMetricsDataAll.zoomFactorWide && phoneMetricsDataAll.zoomFactorWide.data) 
+          delete phoneMetricsDataAll.zoomFactorWide.data;
+      }
 
       phoneMetricsDataAll = {
         'fpsWide' : {
@@ -1019,7 +1045,7 @@
     }
 
     function phoneMetricsDataAllOptimize() {
-      const maxLength = 120;
+      const maxLength = 12;
       var array_parent_ref = [
         phoneMetricsDataAll.fpsWide,
         phoneMetricsDataAll.fpsUltra,
@@ -1048,10 +1074,13 @@
           for(var a_j = start_index; a_j <= half_length; ++a_j) {
             a_n.push(a_p.data[2*a_j]); 
           }
+          delete a_p.data;
           a_p.data = a_n;
           console.log("phoneMetricsDataAllOptimize: a_p_i=" + a_p_i + ", a_p.data.length=" + a_p.data.length + ", start_index=" + start_index + ", half_length=" + half_length + ", a_n.length=" + a_n.length);
         }
       }
+
+      delete array_parent_ref;
     }
 
     function handleAppMessage(ev) {
