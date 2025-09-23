@@ -1018,6 +1018,42 @@
 
     }
 
+    function phoneMetricsDataAllOptimize() {
+      const maxLength = 120;
+      var array_parent_ref = [
+        phoneMetricsDataAll.fpsWide,
+        phoneMetricsDataAll.fpsUltra,
+        phoneMetricsDataAll.thermalState,
+        phoneMetricsDataAll.dockkitBatteryPercentage,
+        phoneMetricsDataAll.pitchDegrees,
+        phoneMetricsDataAll.yawDegrees,
+        phoneMetricsDataAll.rollDegrees,
+        phoneMetricsDataAll.pitchDegreesPerSecs,
+        phoneMetricsDataAll.yawDegreesPerSecs,
+        phoneMetricsDataAll.rollDegreesPerSecs,
+        phoneMetricsDataAll.zoomFactorWide
+      ];
+
+      for(var a_p_i = 0; a_p_i < array_parent_ref.length; ++a_p_i) {
+        var a_p = array_parent_ref[a_p_i];
+        if (maxLength < a_p.data.length) {
+          var a_n = [];
+          var start_index = 0;
+          if (0 < a_p.data.length % 2) {
+            // uneven => skip 1st to get last
+            start_index = 1;
+          }
+
+          var half_length = a_p.data.length/2;
+          for(var a_j = start_index; a_j <= half_length; ++a_j) {
+            a_n.push(a_p.data[2*a_j]); 
+          }
+          a_p.data = a_n;
+          console.log("phoneMetricsDataAllOptimize: a_p_i=" + a_p_i + ", a_p.data.length=" + a_p.data.length + ", start_index=" + start_index + ", half_length=" + half_length + ", a_n.length=" + a_n.length);
+        }
+      }
+    }
+
     function handleAppMessage(ev) {
         //console.log("handleAppMessage: ev=" + ev)
         if (ev && ev.data) {
@@ -1142,6 +1178,7 @@
               phoneMetricsDataAllIndexOfLast = ev.data.index;
             
             phoneMetricsClear.checked = true;
+            phoneMetricsDataAllOptimize();
             updatePhoneMetricsUI();
           } else {
             phoneSettingsData = ev.data;
