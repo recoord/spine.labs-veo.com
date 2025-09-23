@@ -983,8 +983,16 @@
           delete vegaLiteMetricsChartObject.data.values;
           vegaLiteMetricsChartObject.data.values = phoneMetricsData;
         }
+        // var v = vegaLiteMetricsChartObject;
+        // console.log("v = " + v);
+
         // Embed the visualization in the container with id `vis`
+        var placeholder = document.getElementById('#phone-metrics-placeholder');
+        while (placeholder && placeholder.firstChild) {
+          placeholder.removeChild(placeholder.lastChild);
+        }
         vegaEmbed('#phone-metrics-placeholder', vegaLiteMetricsChartObject);
+
       }
 
     }
