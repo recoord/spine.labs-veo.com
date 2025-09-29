@@ -592,6 +592,7 @@
     phoneMetricsDataClear();
 
     var phoneMetricsDataAll = {};
+    var phoneMetricsDataAllParentsArray = [];
     function phoneMetricsDataAllClear() {
 
       if (phoneMetricsDataAll) {
@@ -665,7 +666,19 @@
           'data' : []
         }
       };
-
+      phoneMetricsDataAllParentsArray = [
+        phoneMetricsDataAll.fpsWide,
+        phoneMetricsDataAll.fpsUltra,
+        phoneMetricsDataAll.thermalState,
+        phoneMetricsDataAll.dockkitBatteryPercentage,
+        phoneMetricsDataAll.pitchDegrees,
+        phoneMetricsDataAll.yawDegrees,
+        phoneMetricsDataAll.rollDegrees,
+        phoneMetricsDataAll.pitchDegreesPerSecs,
+        phoneMetricsDataAll.yawDegreesPerSecs,
+        phoneMetricsDataAll.rollDegreesPerSecs,
+        phoneMetricsDataAll.zoomFactorWide
+      ];
     };
     phoneMetricsDataAllClear();
     var phoneMetricsDataAllIndexOfLast = 0;
@@ -1087,46 +1100,93 @@
 
     }
 
-    function phoneMetricsDataAllOptimize() {
-      const phoneMetricsDataAllOptimize_debug = false;
-      const maxLength = 12;
-      var array_parent_ref = [
-        phoneMetricsDataAll.fpsWide,
-        phoneMetricsDataAll.fpsUltra,
-        phoneMetricsDataAll.thermalState,
-        phoneMetricsDataAll.dockkitBatteryPercentage,
-        phoneMetricsDataAll.pitchDegrees,
-        phoneMetricsDataAll.yawDegrees,
-        phoneMetricsDataAll.rollDegrees,
-        phoneMetricsDataAll.pitchDegreesPerSecs,
-        phoneMetricsDataAll.yawDegreesPerSecs,
-        phoneMetricsDataAll.rollDegreesPerSecs,
-        phoneMetricsDataAll.zoomFactorWide
-      ];
+    function dataArrayOptimizeByRemovingIntermediateDuplicates(a_p, epsilon, debug) {
+      var trimmed_count = 0;
+      if (2 < a_p.data.length) {
+        var before_index = -1;
+        var current_index = 0;
+        var after_index = 1;
+        var remove_current = false;
 
-      for(var a_p_i = 0; a_p_i < array_parent_ref.length; ++a_p_i) {
-        var a_p = array_parent_ref[a_p_i];
-        if (maxLength < a_p.data.length) {
-          var a_n = [];
-          var start_index = 0;
-          if (0 < a_p.data.length % 2) {
-            // uneven => skip 1st to get last
-            start_index = 1;
-          }
-
-          var half_length = a_p.data.length/2;
-          for(var a_j = start_index; a_j <= half_length; ++a_j) {
-            a_n.push(a_p.data[2*a_j]); 
-          }
-          delete a_p.data;
-          a_p.data = a_n;
+        while(after_index < a_p.data.length) {
+          remove_current = false;
           
-          if (phoneMetricsDataAllOptimize_debug) 
-            console.log("phoneMetricsDataAllOptimize: a_p_i=" + a_p_i + ", a_p.data.length=" + a_p.data.length + ", start_index=" + start_index + ", half_length=" + half_length + ", a_n.length=" + a_n.length);
+          if (0 <= before_index && after_index < a_p.data.length) {
+            var before_val = a_p.data[before_index].value;
+            var current_val = a_p.data[current_index].value;
+            var after_val = a_p.data[after_index].value;
+            var diff_before_after = Math.abs(before_val - after_val);
+            var diff_before_current = Math.abs(before_val - current_val);
+            if(diff_before_after < epsilon && diff_before_current < epsilon) {
+              remove_current = true;
+            }
+          }
+
+          if(remove_current) {
+            a_p.data.splice(current_index, 1);
+            trimmed_count++;
+          } else {
+            before_index++;
+            current_index++;
+            after_index++;
+          }
+
         }
       }
 
-      delete array_parent_ref;
+      if (debug && 0 < trimmed_count)
+        console.log("dataArrayOptimizeByRemovingIntermediateDuplicates: epsilon=" + epsilon + ", trimmed_count=" + trimmed_count);
+    }
+
+    function dataArrayOptimizeByDiscardingHalf(maxLength, a_p, debug) {
+      var a_n = [];
+      var start_index = 0;
+      if (0 < a_p.data.length % 2) {
+        // uneven => skip 1st to get last
+        start_index = 1;
+      }
+
+      var half_length = a_p.data.length/2;
+      for(var a_j = start_index; a_j <= half_length; ++a_j) {
+        a_n.push(a_p.data[2*a_j]); 
+      }
+
+      if (debug) 
+        console.log("dataArrayOptimizeByDiscardingHalf: a_p.data.length=" + a_p.data.length + ", start_index=" + start_index + ", half_length=" + half_length + ", a_n.length=" + a_n.length);
+
+      return a_n;
+    }
+
+    function phoneMetricsDataAllOptimize() {
+      const phoneMetricsDataAllOptimize_debug = false;
+      const maxLength = 120;
+      const epsilon = 0.001;
+
+      for(var a_p_i = 0; a_p_i < phoneMetricsDataAllParentsArray.length; ++a_p_i) {
+        var a_p = phoneMetricsDataAllParentsArray[a_p_i];
+        // Method#1
+        if (maxLength < a_p.data.length) {
+          var length_before = a_p.data.length;
+          dataArrayOptimizeByRemovingIntermediateDuplicates(a_p, epsilon, phoneMetricsDataAllOptimize_debug);
+          var length_after = a_p.data.length;
+          if(phoneMetricsDataAllOptimize_debug && length_after < length_before)
+            console.log("phoneMetricsDataAllOptimize: datetime= " + (new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })) + ", a_p_i#" + a_p_i + ", length_before=" + length_before + ", length_after=" + length_after + ", epsilon=" + epsilon + " => " + (length_before - length_after) + " duplicates");
+        }
+
+        // Method#2
+        if (maxLength < a_p.data.length) {
+          var length_before = a_p.data.length;
+          var a_n = dataArrayOptimizeByDiscardingHalf(maxLength, a_p, phoneMetricsDataAllOptimize_debug);
+          var length_after = a_n;
+          if(phoneMetricsDataAllOptimize_debug && length_after < length_before)
+            console.log("phoneMetricsDataAllOptimize: datetime= " + (new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })) + ", a_p_i#" + a_p_i + ", length_before=" + length_before + ", length_after=" + length_after + " => " + (length_before - length_after) + " discarded");
+          delete a_p.data;
+          a_p.data = a_n;
+        }
+
+        //if(a_p_i == 1) 
+        //  console.log("a_p_i#" + a_p_i + ", a_p.data.length=" + a_p.data.length);
+      }
     }
 
     function handleAppMessage(ev) {
