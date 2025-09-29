@@ -706,6 +706,7 @@
         }]
     };
     var vegaLiteListeners = [];
+    var vegaLiteReturnObject = null;
     const orig = EventTarget.prototype.addEventListener;
     EventTarget.prototype.addEventListener = function(...args) {
       if (this instanceof HTMLElement) {
@@ -914,7 +915,7 @@
       phoneSettingsExternalStorageLabelEl.style.display = displayValRecordingStorage;
       phoneSettingsCloudStorageLabelEl.style.display = displayValRecordingStorage;
     }
-    function updatePhoneMetricsUI(forceUpdate) {
+    async function updatePhoneMetricsUI(forceUpdate) {
 
       // Clear data used by graph and rebuild it
 
@@ -1003,12 +1004,23 @@
           placeholder.removeChild(placeholder.lastChild);
         }
         // Cleanup leaked vega lite event handlers
+//        console.log("updatePhoneMetricsUI: cleaning up " + vegaLiteListeners.length + " event listeners.");
         while (0 < vegaLiteListeners.length) {
           var listener = vegaLiteListeners.pop();
           document.removeEventListener(listener.type, listener.fn);
         }
+
+        // Clean vega lite ref object
+        if (vegaLiteReturnObject) {
+          vegaLiteReturnObject.finalize();
+          vegaLiteReturnObject = null;
+        }
         // Embed the visualization in the container with id `vis`
-        vegaEmbed('#phone-metrics-placeholder', vegaLiteMetricsChartObject);
+//        console.log("updatePhoneMetricsUI: before ");
+        vegaEmbed('#phone-metrics-placeholder', vegaLiteMetricsChartObject).then(r => {
+//          console.log("updatePhoneMetricsUI: after r=" + r);
+          vegaLiteReturnObject = r;
+        });
       }
 
     }
