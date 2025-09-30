@@ -572,7 +572,7 @@
     let targetSessionId = null;
 
     // Gamepad changes are sent to Daily as messages
-    const onGamePadChange_debug = true;
+    const onGamePadChange_debug = false;
     function onGamePadDataChange() {
       while(0 < gamePadData_changes.length) {
         const gamePadDataChange = gamePadData_changes.shift();
