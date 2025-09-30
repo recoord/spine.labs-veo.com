@@ -303,6 +303,12 @@
           <span class="switch-handle"></span> 
         </label>
 
+        <label id="phoneMetricsToggleBatteryPercentageLabel" class="switch">
+          <input id="phoneMetricsToggleBatteryPercentage" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+          <span class="switch-label" data-on="batteryPercentage - On" data-off="batteryPercentage - Off"></span> 
+          <span class="switch-handle"></span> 
+        </label>
+
         <label id="phoneMetricsToggleDockkitBatteryPercentageLabel" class="switch">
           <input id="phoneMetricsToggleDockkitBatteryPercentage" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
           <span class="switch-label" data-on="dockkitBatteryPercentage - On" data-off="dockkitBatteryPercentage - Off"></span> 
@@ -493,6 +499,8 @@
     const phoneMetricsToggleFpsUltraEl = document.getElementById("phoneMetricsToggleFpsUltra")
     const phoneMetricsToggleThermalStateLabelEl = document.getElementById("phoneMetricsToggleThermalStateLabel")
     const phoneMetricsToggleThermalStateEl = document.getElementById("phoneMetricsToggleThermalState")
+    const phoneMetricsToggleBatteryPercentageLabelEl = document.getElementById("phoneMetricsToggleBatteryPercentageLabel")
+    const phoneMetricsToggleBatteryPercentageEl = document.getElementById("phoneMetricsToggleBatteryPercentage")
     const phoneMetricsToogleDockkitBatteryPercentageLabelEl = document.getElementById("phoneMetricsToggleDockkitBatteryPercentageLabel")
     const phoneMetricsToggleDockkitBatteryPercentageEl = document.getElementById("phoneMetricsToggleDockkitBatteryPercentage")
     const phoneMetricsTogglePitchDegreesLabelEl = document.getElementById("phoneMetricsTogglePitchDegreesLabel")
@@ -602,6 +610,8 @@
           delete phoneMetricsDataAll.fpsUltra.data;
         if (phoneMetricsDataAll.thermalState && phoneMetricsDataAll.thermalState.data) 
           delete phoneMetricsDataAll.thermalState.data;
+        if (phoneMetricsDataAll.batteryPercentage && phoneMetricsDataAll.batteryPercentage.data) 
+          delete phoneMetricsDataAll.batteryPercentage.data;
         if (phoneMetricsDataAll.dockkitBatteryPercentage && phoneMetricsDataAll.dockkitBatteryPercentage.data) 
           delete phoneMetricsDataAll.dockkitBatteryPercentage.data;
         if (phoneMetricsDataAll.pitchDegrees && phoneMetricsDataAll.pitchDegrees.data) 
@@ -630,6 +640,10 @@
           'data' : []
         },
         'thermalState' : {
+          'enabled' : true,
+          'data' : []
+        },
+        'batteryPercentage' : {
           'enabled' : true,
           'data' : []
         },
@@ -670,6 +684,7 @@
         phoneMetricsDataAll.fpsWide,
         phoneMetricsDataAll.fpsUltra,
         phoneMetricsDataAll.thermalState,
+        phoneMetricsDataAll.batteryPercentage,
         phoneMetricsDataAll.dockkitBatteryPercentage,
         phoneMetricsDataAll.pitchDegrees,
         phoneMetricsDataAll.yawDegrees,
@@ -946,6 +961,10 @@
           phoneMetricsDataAdd(phoneMetricsDataAll.thermalState.data, phoneMetricsDataAllIndexOfLast);
         }
 
+        if (phoneMetricsDataAll.batteryPercentage.enabled) {
+          phoneMetricsDataAdd(phoneMetricsDataAll.batteryPercentage.data, phoneMetricsDataAllIndexOfLast);
+        }
+
         if (phoneMetricsDataAll.dockkitBatteryPercentage.enabled) {
           phoneMetricsDataAdd(phoneMetricsDataAll.dockkitBatteryPercentage.data, phoneMetricsDataAllIndexOfLast);
         }
@@ -983,6 +1002,7 @@
       phoneMetricsToggleFpsWideLabelEl.style.display = displayValSeries;
       phoneMetricsToggleFpsUltraLabelEl.style.display = displayValSeries;
       phoneMetricsToggleThermalStateLabelEl.style.display = displayValSeries;
+      phoneMetricsToggleBatteryPercentageLabelEl.style.display = displayValSeries;
       phoneMetricsToogleDockkitBatteryPercentageLabelEl.style.display = displayValSeries;
       phoneMetricsTogglePitchDegreesLabelEl.style.display = displayValSeries;
       phoneMetricsToggleYawDegreesLabelEl.style.display = displayValSeries;
@@ -995,6 +1015,7 @@
       phoneMetricsToggleFpsWideEl.checked = phoneMetricsDataAll.fpsWide.enabled;
       phoneMetricsToggleFpsUltraEl.checked = phoneMetricsDataAll.fpsUltra.enabled;
       phoneMetricsToggleThermalStateEl.checked = phoneMetricsDataAll.thermalState.enabled;
+      phoneMetricsToggleBatteryPercentageEl.checked = phoneMetricsDataAll.batteryPercentage.enabled;
       phoneMetricsToggleDockkitBatteryPercentageEl.checked = phoneMetricsDataAll.dockkitBatteryPercentage.enabled;
       phoneMetricsTogglePitchDegreesEl.checked = phoneMetricsDataAll.pitchDegrees.enabled;
       phoneMetricsToggleYawDegreesEl.checked = phoneMetricsDataAll.yawDegrees.enabled;
@@ -1214,46 +1235,52 @@
             var entry4 = {
               'index': ev.data.index,
               'time': new Date(ev.data.time_utc),
+              'value': ev.data.batteryPercentage !== undefined ? ev.data.batteryPercentage : null,
+              'metric': 'battery [%]',
+            };
+            var entry5 = {
+              'index': ev.data.index,
+              'time': new Date(ev.data.time_utc),
               'value': ev.data.dockkitBatteryPercentage !== undefined ? ev.data.dockkitBatteryPercentage : null,
               'metric': 'dockkitBattery [%]',
             };
-            var entry5 = {
+            var entry6 = {
               'index': ev.data.index,
               'time': new Date(ev.data.time_utc),
               'value': ev.data.pitchDegrees !== undefined ? ev.data.pitchDegrees : null,
               'metric': 'pitch [°]',
             };
-            var entry6 = {
+            var entry7 = {
               'index': ev.data.index,
               'time': new Date(ev.data.time_utc),
               'value': ev.data.yawDegrees !== undefined ? ev.data.yawDegrees : null,
               'metric': 'yaw [°]',
             };
-            var entry7 = {
+            var entry8 = {
               'index': ev.data.index,
               'time': new Date(ev.data.time_utc),
               'value': ev.data.rollDegrees !== undefined ? ev.data.rollDegrees : null,
               'metric': 'roll [°]',
             };
-            var entry8 = {
+            var entry9 = {
               'index': ev.data.index,
               'time': new Date(ev.data.time_utc),
               'value': ev.data.pitchDegreesPerSecs !== undefined ? ev.data.pitchDegreesPerSecs : null,
               'metric': 'pitch vel. [°/s]',
             };
-            var entry9 = {
+            var entry10 = {
               'index': ev.data.index,
               'time': new Date(ev.data.time_utc),
               'value': ev.data.yawDegreesPerSecs !== undefined ? ev.data.yawDegreesPerSecs : null,
               'metric': 'yaw vel. [°/s]',
             };
-            var entry10 = {
+            var entry11 = {
               'index': ev.data.index,
               'time': new Date(ev.data.time_utc),
               'value': ev.data.rollDegreesPerSecs !== undefined ? ev.data.rollDegreesPerSecs : null,
               'metric': 'roll vel. [°/s]',
             };
-            var entry11 = {
+            var entry12 = {
               'index': ev.data.index,
               'time': new Date(ev.data.time_utc),
               'value': ev.data.zoomFactorWide !== null ? 100.0*ev.data.zoomFactorWide : nil,
@@ -1264,14 +1291,15 @@
             phoneMetricsDataAll.fpsWide.data.push(entry1);
             phoneMetricsDataAll.fpsUltra.data.push(entry2);
             phoneMetricsDataAll.thermalState.data.push(entry3);
-            phoneMetricsDataAll.dockkitBatteryPercentage.data.push(entry4);
-            phoneMetricsDataAll.pitchDegrees.data.push(entry5);
-            phoneMetricsDataAll.yawDegrees.data.push(entry6);
-            phoneMetricsDataAll.rollDegrees.data.push(entry7);
-            phoneMetricsDataAll.pitchDegreesPerSecs.data.push(entry8);
-            phoneMetricsDataAll.yawDegreesPerSecs.data.push(entry9);
-            phoneMetricsDataAll.rollDegreesPerSecs.data.push(entry10);
-            phoneMetricsDataAll.zoomFactorWide.data.push(entry11);
+            phoneMetricsDataAll.batteryPercentage.data.push(entry4);
+            phoneMetricsDataAll.dockkitBatteryPercentage.data.push(entry5);
+            phoneMetricsDataAll.pitchDegrees.data.push(entry6);
+            phoneMetricsDataAll.yawDegrees.data.push(entry7);
+            phoneMetricsDataAll.rollDegrees.data.push(entry8);
+            phoneMetricsDataAll.pitchDegreesPerSecs.data.push(entry9);
+            phoneMetricsDataAll.yawDegreesPerSecs.data.push(entry10);
+            phoneMetricsDataAll.rollDegreesPerSecs.data.push(entry11);
+            phoneMetricsDataAll.zoomFactorWide.data.push(entry12);
 
             if (phoneMetricsTogglePlottingEl.checked) {
               if (phoneMetricsDataAll.fpsWide.enabled) {
@@ -1283,29 +1311,32 @@
               if (phoneMetricsDataAll.thermalState.enabled) {
                 phoneMetricsData.push(entry3);
               }
-              if (phoneMetricsDataAll.dockkitBatteryPercentage.enabled) {
+              if (phoneMetricsDataAll.batteryPercentage.enabled) {
                 phoneMetricsData.push(entry4);
               }
-              if (phoneMetricsDataAll.pitchDegrees.enabled) {
+              if (phoneMetricsDataAll.dockkitBatteryPercentage.enabled) {
                 phoneMetricsData.push(entry5);
               }
-              if (phoneMetricsDataAll.yawDegrees.enabled) {
+              if (phoneMetricsDataAll.pitchDegrees.enabled) {
                 phoneMetricsData.push(entry6);
               }
-              if (phoneMetricsDataAll.rollDegrees.enabled) {
+              if (phoneMetricsDataAll.yawDegrees.enabled) {
                 phoneMetricsData.push(entry7);
               }
-              if (phoneMetricsDataAll.pitchDegreesPerSecs.enabled) {
+              if (phoneMetricsDataAll.rollDegrees.enabled) {
                 phoneMetricsData.push(entry8);
               }
-              if (phoneMetricsDataAll.yawDegreesPerSecs.enabled) {
+              if (phoneMetricsDataAll.pitchDegreesPerSecs.enabled) {
                 phoneMetricsData.push(entry9);
               }
-              if (phoneMetricsDataAll.rollDegreesPerSecs.enabled) {
+              if (phoneMetricsDataAll.yawDegreesPerSecs.enabled) {
                 phoneMetricsData.push(entry10);
               }
-              if (phoneMetricsDataAll.zoomFactorWide.enabled) {
+              if (phoneMetricsDataAll.rollDegreesPerSecs.enabled) {
                 phoneMetricsData.push(entry11);
+              }
+              if (phoneMetricsDataAll.zoomFactorWide.enabled) {
+                phoneMetricsData.push(entry12);
               }
             }
 
@@ -1332,6 +1363,7 @@
         case phoneMetricsToggleFpsWideEl.id: phoneMetricsDataAll.fpsWide.enabled = obj.checked; updatePhoneMetricsUI(true); break;
         case phoneMetricsToggleFpsUltraEl.id: phoneMetricsDataAll.fpsUltra.enabled = obj.checked; updatePhoneMetricsUI(true); break;
         case phoneMetricsToggleThermalStateEl.id: phoneMetricsDataAll.thermalState.enabled = obj.checked; updatePhoneMetricsUI(true); break;
+        case phoneMetricsToggleBatteryPercentageEl.id: phoneMetricsDataAll.batteryPercentage.enabled = obj.checked; updatePhoneMetricsUI(true); break;
         case phoneMetricsToggleDockkitBatteryPercentageEl.id: phoneMetricsDataAll.dockkitBatteryPercentage.enabled = obj.checked; updatePhoneMetricsUI(true); break;
         case phoneMetricsTogglePitchDegreesEl.id: phoneMetricsDataAll.pitchDegrees.enabled = obj.checked; updatePhoneMetricsUI(true); break;
         case phoneMetricsToggleYawDegreesEl.id: phoneMetricsDataAll.yawDegrees.enabled = obj.checked; updatePhoneMetricsUI(true); break;
