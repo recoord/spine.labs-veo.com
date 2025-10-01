@@ -331,6 +331,22 @@
           <span class="switch-handle"></span> 
         </label>
 
+        <label id="phoneMetricsToggleSetPitchDegreesPerSecsLabel" class="switch">
+          <input id="phoneMetricsToggleSetPitchDegreesPerSecs" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+          <span class="switch-label" data-on="setPitchDegreesPerSecs - On" data-off="setPitchDegreesPerSecs - Off"></span> 
+          <span class="switch-handle"></span> 
+        </label>
+        <label id="phoneMetricsToggleSetYawDegreesPerSecsLabel" class="switch">
+          <input id="phoneMetricsToggleSetYawDegreesPerSecs" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+          <span class="switch-label" data-on="setYawDegreesPerSecs - On" data-off="setYawDegreesPerSecs - Off"></span> 
+          <span class="switch-handle"></span> 
+        </label>
+        <label id="phoneMetricsToggleSetRollDegreesPerSecsLabel" class="switch">
+          <input id="phoneMetricsToggleSetRollDegreesPerSecs" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+          <span class="switch-label" data-on="setRollDegreesPerSecs - On" data-off="setRollDegreesPerSecs - Off"></span> 
+          <span class="switch-handle"></span> 
+        </label>
+
         <label id="phoneMetricsTogglePitchDegreesPerSecsLabel" class="switch">
           <input id="phoneMetricsTogglePitchDegreesPerSecs" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
           <span class="switch-label" data-on="pitchDegreesPerSecs - On" data-off="pitchDegreesPerSecs - Off"></span> 
@@ -509,6 +525,12 @@
     const phoneMetricsToggleYawDegreesEl = document.getElementById("phoneMetricsToggleYawDegrees")
     const phoneMetricsToggleRollDegreesLabelEl = document.getElementById("phoneMetricsToggleRollDegreesLabel")
     const phoneMetricsToggleRollDegreesEl = document.getElementById("phoneMetricsToggleRollDegrees")
+    const phoneMetricsToggleSetPitchDegreesPerSecsLabelEl = document.getElementById("phoneMetricsToggleSetPitchDegreesPerSecsLabel")
+    const phoneMetricsToggleSetPitchDegreesPerSecsEl = document.getElementById("phoneMetricsToggleSetPitchDegreesPerSecs")
+    const phoneMetricsToggleSetYawDegreesPerSecsLabelEl = document.getElementById("phoneMetricsToggleSetYawDegreesPerSecsLabel")
+    const phoneMetricsToggleSetYawDegreesPerSecsEl = document.getElementById("phoneMetricsToggleSetYawDegreesPerSecs")
+    const phoneMetricsToggleSetRollDegreesPerSecsLabelEl = document.getElementById("phoneMetricsToggleSetRollDegreesPerSecsLabel")
+    const phoneMetricsToggleSetRollDegreesPerSecsEl = document.getElementById("phoneMetricsToggleSetRollDegreesPerSecs")
     const phoneMetricsTogglePitchDegreesPerSecsLabelEl = document.getElementById("phoneMetricsTogglePitchDegreesPerSecsLabel")
     const phoneMetricsTogglePitchDegreesPerSecsEl = document.getElementById("phoneMetricsTogglePitchDegreesPerSecs")
     const phoneMetricsToggleYawDegreesPerSecsLabelEl = document.getElementById("phoneMetricsToggleYawDegreesPerSecsLabel")
@@ -599,7 +621,7 @@
     };
     phoneMetricsDataClear();
 
-    var phoneMetricsDataAll = {};
+    var phoneMetricsDataAll = null;
     var phoneMetricsDataAllParentsArray = [];
     function phoneMetricsDataAllClear() {
 
@@ -620,6 +642,12 @@
           delete phoneMetricsDataAll.yawDegrees.data;
         if (phoneMetricsDataAll.rollDegrees && phoneMetricsDataAll.rollDegrees.data) 
           delete phoneMetricsDataAll.rollDegrees.data;
+        if (phoneMetricsDataAll.setPitchDegreesPerSecs && phoneMetricsDataAll.setPitchDegreesPerSecs.data) 
+          delete phoneMetricsDataAll.setPitchDegreesPerSecs.data;
+        if (phoneMetricsDataAll.setYawDegreesPerSecs && phoneMetricsDataAll.setYawDegreesPerSecs.data) 
+          delete phoneMetricsDataAll.setYawDegreesPerSecs.data;
+        if (phoneMetricsDataAll.setRollDegreesPerSecs && phoneMetricsDataAll.setRollDegreesPerSecs.data) 
+          delete phoneMetricsDataAll.setRollDegreesPerSecs.data;
         if (phoneMetricsDataAll.pitchDegreesPerSecs && phoneMetricsDataAll.pitchDegreesPerSecs.data) 
           delete phoneMetricsDataAll.pitchDegreesPerSecs.data;
         if (phoneMetricsDataAll.yawDegreesPerSecs && phoneMetricsDataAll.yawDegreesPerSecs.data) 
@@ -630,53 +658,66 @@
           delete phoneMetricsDataAll.zoomFactorWide.data;
       }
 
+      var current = phoneMetricsDataAll;
       phoneMetricsDataAll = {
         'fpsWide' : {
-          'enabled' : true,
+          'enabled' : current ? current.fpsWide.enabled : true,
           'data' : []
         },
         'fpsUltra' : {
-          'enabled' : true,
+          'enabled' : current ? current.fpsUltra.enabled : true,
           'data' : []
         },
         'thermalState' : {
-          'enabled' : true,
+          'enabled' : current ? current.thermalState.enabled : true,
           'data' : []
         },
         'batteryPercentage' : {
-          'enabled' : true,
+          'enabled' : current ? current.batteryPercentage.enabled : true,
           'data' : []
         },
         'dockkitBatteryPercentage' : {
-          'enabled' : true,
+          'enabled' : current ? current.dockkitBatteryPercentage.enabled : true,
           'data' : []
         },
         'pitchDegrees' : {
-          'enabled' : true,
+          'enabled' : current ? current.pitchDegrees.enabled : true,
           'data' : []
         },
         'yawDegrees' : {
-          'enabled' : true,
+          'enabled' : current ? current.yawDegrees.enabled : true,
           'data' : []
         },
         'rollDegrees' : {
-          'enabled' : true,
+          'enabled' : current ? current.rollDegrees.enabled : true,
+          'data' : []
+        },
+        'setPitchDegreesPerSecs' : {
+          'enabled' : current ? current.setPitchDegreesPerSecs.enabled : true,
+          'data' : []
+        },
+        'setYawDegreesPerSecs' : {
+          'enabled' : current ? current.setYawDegreesPerSecs.enabled : true,
+          'data' : []
+        },
+        'setRollDegreesPerSecs' : {
+          'enabled' : current ? current.setRollDegreesPerSecs.enabled : true,
           'data' : []
         },
         'pitchDegreesPerSecs' : {
-          'enabled' : true,
+          'enabled' : current ? current.pitchDegreesPerSecs.enabled : true,
           'data' : []
         },
         'yawDegreesPerSecs' : {
-          'enabled' : true,
+          'enabled' : current ? current.yawDegreesPerSecs.enabled : true,
           'data' : []
         },
         'rollDegreesPerSecs' : {
-          'enabled' : true,
+          'enabled' : current ? current.rollDegreesPerSecs.enabled : true,
           'data' : []
         },
         'zoomFactorWide' : {
-          'enabled' : true,
+          'enabled' : current ? current.zoomFactorWide.enabled : true,
           'data' : []
         }
       };
@@ -689,6 +730,9 @@
         phoneMetricsDataAll.pitchDegrees,
         phoneMetricsDataAll.yawDegrees,
         phoneMetricsDataAll.rollDegrees,
+        phoneMetricsDataAll.setPitchDegreesPerSecs,
+        phoneMetricsDataAll.setYawDegreesPerSecs,
+        phoneMetricsDataAll.setRollDegreesPerSecs,
         phoneMetricsDataAll.pitchDegreesPerSecs,
         phoneMetricsDataAll.yawDegreesPerSecs,
         phoneMetricsDataAll.rollDegreesPerSecs,
@@ -979,6 +1023,16 @@
           phoneMetricsDataAdd(phoneMetricsDataAll.rollDegrees.data, phoneMetricsDataAllIndexOfLast);
         }
 
+        if (phoneMetricsDataAll.setPitchDegreesPerSecs.enabled) {
+          phoneMetricsDataAdd(phoneMetricsDataAll.setPitchDegreesPerSecs.data, phoneMetricsDataAllIndexOfLast);
+        }
+        if (phoneMetricsDataAll.setYawDegreesPerSecs.enabled) {
+          phoneMetricsDataAdd(phoneMetricsDataAll.setYawDegreesPerSecs.data, phoneMetricsDataAllIndexOfLast);
+        }
+        if (phoneMetricsDataAll.setRollDegreesPerSecs.enabled) {
+          phoneMetricsDataAdd(phoneMetricsDataAll.setRollDegreesPerSecs.data, phoneMetricsDataAllIndexOfLast);
+        }
+
         if (phoneMetricsDataAll.pitchDegreesPerSecs.enabled) {
           phoneMetricsDataAdd(phoneMetricsDataAll.pitchDegreesPerSecs.data, phoneMetricsDataAllIndexOfLast);
         }
@@ -1007,6 +1061,9 @@
       phoneMetricsTogglePitchDegreesLabelEl.style.display = displayValSeries;
       phoneMetricsToggleYawDegreesLabelEl.style.display = displayValSeries;
       phoneMetricsToggleRollDegreesLabelEl.style.display = displayValSeries;
+      phoneMetricsToggleSetPitchDegreesPerSecsLabelEl.style.display = displayValSeries;
+      phoneMetricsToggleSetYawDegreesPerSecsLabelEl.style.display = displayValSeries;
+      phoneMetricsToggleSetRollDegreesPerSecsLabelEl.style.display = displayValSeries;
       phoneMetricsTogglePitchDegreesPerSecsLabelEl.style.display = displayValSeries;
       phoneMetricsToggleYawDegreesPerSecsLabelEl.style.display = displayValSeries;
       phoneMetricsToggleRollDegreesPerSecsLabelEl.style.display = displayValSeries;
@@ -1020,6 +1077,9 @@
       phoneMetricsTogglePitchDegreesEl.checked = phoneMetricsDataAll.pitchDegrees.enabled;
       phoneMetricsToggleYawDegreesEl.checked = phoneMetricsDataAll.yawDegrees.enabled;
       phoneMetricsToggleRollDegreesEl.checked = phoneMetricsDataAll.rollDegrees.enabled;
+      phoneMetricsToggleSetPitchDegreesPerSecsEl.checked = phoneMetricsDataAll.setPitchDegreesPerSecs.enabled;
+      phoneMetricsToggleSetYawDegreesPerSecsEl.checked = phoneMetricsDataAll.setYawDegreesPerSecs.enabled;
+      phoneMetricsToggleSetRollDegreesPerSecsEl.checked = phoneMetricsDataAll.setRollDegreesPerSecs.enabled;
       phoneMetricsTogglePitchDegreesPerSecsEl.checked = phoneMetricsDataAll.pitchDegreesPerSecs.enabled;
       phoneMetricsToggleYawDegreesPerSecsEl.checked = phoneMetricsDataAll.yawDegreesPerSecs.enabled;
       phoneMetricsToggleRollDegreesPerSecsEl.checked = phoneMetricsDataAll.rollDegreesPerSecs.enabled;
@@ -1264,23 +1324,41 @@
             };
             var entry9 = {
               'index': ev.data.index,
+              'time': ev.data.motionStatesSetTimeUtc !== undefined ? new Date(ev.data.motionStatesSetTimeUtc) : new Date(ev.data.time_utc),
+              'value': ev.data.setPitchDegreesPerSecs !== undefined ? ev.data.setPitchDegreesPerSecs : null,
+              'metric': 'set pitch vel. [°/s]',
+            };
+            var entry10 = {
+              'index': ev.data.index,
+              'time': ev.data.motionStatesSetTimeUtc !== undefined ? new Date(ev.data.motionStatesSetTimeUtc) : new Date(ev.data.time_utc),
+              'value': ev.data.setYawDegreesPerSecs !== undefined ? ev.data.setYawDegreesPerSecs : null,
+              'metric': 'set yaw vel. [°/s]',
+            };
+            var entry11 = {
+              'index': ev.data.index,
+              'time': ev.data.motionStatesSetTimeUtc !== undefined ? new Date(ev.data.motionStatesSetTimeUtc) : new Date(ev.data.time_utc),
+              'value': ev.data.setRollDegreesPerSecs !== undefined ? ev.data.setRollDegreesPerSecs : null,
+              'metric': 'set roll vel. [°/s]',
+            };
+            var entry12 = {
+              'index': ev.data.index,
               'time': ev.data.motionStatesTimeUtc !== undefined ? new Date(ev.data.motionStatesTimeUtc) : new Date(ev.data.time_utc),
               'value': ev.data.pitchDegreesPerSecs !== undefined ? ev.data.pitchDegreesPerSecs : null,
               'metric': 'pitch vel. [°/s]',
             };
-            var entry10 = {
+            var entry13 = {
               'index': ev.data.index,
               'time': ev.data.motionStatesTimeUtc !== undefined ? new Date(ev.data.motionStatesTimeUtc) : new Date(ev.data.time_utc),
               'value': ev.data.yawDegreesPerSecs !== undefined ? ev.data.yawDegreesPerSecs : null,
               'metric': 'yaw vel. [°/s]',
             };
-            var entry11 = {
+            var entry14 = {
               'index': ev.data.index,
               'time': ev.data.motionStatesTimeUtc !== undefined ? new Date(ev.data.motionStatesTimeUtc) : new Date(ev.data.time_utc),
               'value': ev.data.rollDegreesPerSecs !== undefined ? ev.data.rollDegreesPerSecs : null,
               'metric': 'roll vel. [°/s]',
             };
-            var entry12 = {
+            var entry15 = {
               'index': ev.data.index,
               'time': new Date(ev.data.time_utc),
               'value': ev.data.zoomFactorWide !== null ? 100.0*ev.data.zoomFactorWide : nil,
@@ -1296,9 +1374,12 @@
             phoneMetricsDataAll.pitchDegrees.data.push(entry6);
             phoneMetricsDataAll.yawDegrees.data.push(entry7);
             phoneMetricsDataAll.rollDegrees.data.push(entry8);
-            phoneMetricsDataAll.pitchDegreesPerSecs.data.push(entry9);
-            phoneMetricsDataAll.yawDegreesPerSecs.data.push(entry10);
-            phoneMetricsDataAll.rollDegreesPerSecs.data.push(entry11);
+            phoneMetricsDataAll.setPitchDegreesPerSecs.data.push(entry9);
+            phoneMetricsDataAll.setYawDegreesPerSecs.data.push(entry10);
+            phoneMetricsDataAll.setRollDegreesPerSecs.data.push(entry11);
+            phoneMetricsDataAll.pitchDegreesPerSecs.data.push(entry12);
+            phoneMetricsDataAll.yawDegreesPerSecs.data.push(entry13);
+            phoneMetricsDataAll.rollDegreesPerSecs.data.push(entry14);
             phoneMetricsDataAll.zoomFactorWide.data.push(entry12);
 
             if (phoneMetricsTogglePlottingEl.checked) {
@@ -1326,17 +1407,26 @@
               if (phoneMetricsDataAll.rollDegrees.enabled) {
                 phoneMetricsData.push(entry8);
               }
-              if (phoneMetricsDataAll.pitchDegreesPerSecs.enabled) {
+              if (phoneMetricsDataAll.setPitchDegreesPerSecs.enabled) {
                 phoneMetricsData.push(entry9);
               }
-              if (phoneMetricsDataAll.yawDegreesPerSecs.enabled) {
+              if (phoneMetricsDataAll.setYawDegreesPerSecs.enabled) {
                 phoneMetricsData.push(entry10);
               }
-              if (phoneMetricsDataAll.rollDegreesPerSecs.enabled) {
+              if (phoneMetricsDataAll.setRollDegreesPerSecs.enabled) {
                 phoneMetricsData.push(entry11);
               }
-              if (phoneMetricsDataAll.zoomFactorWide.enabled) {
+              if (phoneMetricsDataAll.pitchDegreesPerSecs.enabled) {
                 phoneMetricsData.push(entry12);
+              }
+              if (phoneMetricsDataAll.yawDegreesPerSecs.enabled) {
+                phoneMetricsData.push(entry13);
+              }
+              if (phoneMetricsDataAll.rollDegreesPerSecs.enabled) {
+                phoneMetricsData.push(entry14);
+              }
+              if (phoneMetricsDataAll.zoomFactorWide.enabled) {
+                phoneMetricsData.push(entry15);
               }
             }
 
@@ -1368,6 +1458,9 @@
         case phoneMetricsTogglePitchDegreesEl.id: phoneMetricsDataAll.pitchDegrees.enabled = obj.checked; updatePhoneMetricsUI(true); break;
         case phoneMetricsToggleYawDegreesEl.id: phoneMetricsDataAll.yawDegrees.enabled = obj.checked; updatePhoneMetricsUI(true); break;
         case phoneMetricsToggleRollDegreesEl.id: phoneMetricsDataAll.rollDegrees.enabled = obj.checked; updatePhoneMetricsUI(true); break;
+        case phoneMetricsToggleSetPitchDegreesPerSecsEl.id: phoneMetricsDataAll.setPitchDegreesPerSecs.enabled = obj.checked; updatePhoneMetricsUI(true); break;
+        case phoneMetricsToggleSetYawDegreesPerSecsEl.id: phoneMetricsDataAll.setYawDegreesPerSecs.enabled = obj.checked; updatePhoneMetricsUI(true); break;
+        case phoneMetricsToggleSetRollDegreesPerSecsEl.id: phoneMetricsDataAll.setRollDegreesPerSecs.enabled = obj.checked; updatePhoneMetricsUI(true); break;
         case phoneMetricsTogglePitchDegreesPerSecsEl.id: phoneMetricsDataAll.pitchDegreesPerSecs.enabled = obj.checked; updatePhoneMetricsUI(true); break;
         case phoneMetricsToggleYawDegreesPerSecsEl.id: phoneMetricsDataAll.yawDegreesPerSecs.enabled = obj.checked; updatePhoneMetricsUI(true); break;
         case phoneMetricsToggleRollDegreesPerSecsEl.id: phoneMetricsDataAll.rollDegreesPerSecs.enabled = obj.checked; updatePhoneMetricsUI(true); break;
