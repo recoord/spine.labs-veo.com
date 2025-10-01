@@ -1246,37 +1246,37 @@
             };
             var entry6 = {
               'index': ev.data.index,
-              'time': new Date(ev.data.time_utc),
+              'time': ev.data.motionStatesTimeUtc !== undefined ? new Date(ev.data.motionStatesTimeUtc) : new Date(ev.data.time_utc),
               'value': ev.data.pitchDegrees !== undefined ? ev.data.pitchDegrees : null,
               'metric': 'pitch [°]',
             };
             var entry7 = {
               'index': ev.data.index,
-              'time': new Date(ev.data.time_utc),
+              'time': ev.data.motionStatesTimeUtc !== undefined ? new Date(ev.data.motionStatesTimeUtc) : new Date(ev.data.time_utc),
               'value': ev.data.yawDegrees !== undefined ? ev.data.yawDegrees : null,
               'metric': 'yaw [°]',
             };
             var entry8 = {
               'index': ev.data.index,
-              'time': new Date(ev.data.time_utc),
+              'time': ev.data.motionStatesTimeUtc !== undefined ? new Date(ev.data.motionStatesTimeUtc) : new Date(ev.data.time_utc),
               'value': ev.data.rollDegrees !== undefined ? ev.data.rollDegrees : null,
               'metric': 'roll [°]',
             };
             var entry9 = {
               'index': ev.data.index,
-              'time': new Date(ev.data.time_utc),
+              'time': ev.data.motionStatesTimeUtc !== undefined ? new Date(ev.data.motionStatesTimeUtc) : new Date(ev.data.time_utc),
               'value': ev.data.pitchDegreesPerSecs !== undefined ? ev.data.pitchDegreesPerSecs : null,
               'metric': 'pitch vel. [°/s]',
             };
             var entry10 = {
               'index': ev.data.index,
-              'time': new Date(ev.data.time_utc),
+              'time': ev.data.motionStatesTimeUtc !== undefined ? new Date(ev.data.motionStatesTimeUtc) : new Date(ev.data.time_utc),
               'value': ev.data.yawDegreesPerSecs !== undefined ? ev.data.yawDegreesPerSecs : null,
               'metric': 'yaw vel. [°/s]',
             };
             var entry11 = {
               'index': ev.data.index,
-              'time': new Date(ev.data.time_utc),
+              'time': ev.data.motionStatesTimeUtc !== undefined ? new Date(ev.data.motionStatesTimeUtc) : new Date(ev.data.time_utc),
               'value': ev.data.rollDegreesPerSecs !== undefined ? ev.data.rollDegreesPerSecs : null,
               'metric': 'roll vel. [°/s]',
             };
