@@ -390,9 +390,9 @@
           <input id="settingsGroupAI" class="switch-group-input" type="checkbox" onchange="updatePhoneSettingsUI()" />
           <span class="switch-group-label" data-on="AI" data-off="AI"></span> 
         </label>
-        <label id="settingsOverlayEnableAILabel" class="switch">
-          <input id="settingsOverlayEnableAI" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
-          <span class="switch-label" data-on="overlayEnableAI" data-off="overlayEnableAI"></span> 
+        <label id="settingsEnableAILabel" class="switch">
+          <input id="settingsEnableAI" class="switch-input" type="checkbox" onchange="settingsWebUserChangedProperty(this)" />
+          <span class="switch-label" data-on="enableAI" data-off="enableAI"></span> 
           <span class="switch-handle"></span> 
         </label>
       </div>
@@ -548,8 +548,8 @@
     const phoneSettingsCustomerBuildEl = document.getElementById("settingsCustomerBuild");
 
     const phoneSettingsGroupAIEl = document.getElementById("settingsGroupAI");
-    const phoneSettingsOverlayEnableAILabelEl = document.getElementById("settingsOverlayEnableAILabel");
-    const phoneSettingsOverlayEnableAIEl = document.getElementById("settingsOverlayEnableAI");
+    const phoneSettingsEnableAILabelEl = document.getElementById("settingsEnableAILabel");
+    const phoneSettingsEnableAIEl = document.getElementById("settingsEnableAI");
 
     const phoneSettingsGroupCaptureEl = document.getElementById("settingsGroupCapture");
     const phoneSettingsCaptureWideLabelEl = document.getElementById("settingsCaptureWideLabel");
@@ -805,7 +805,7 @@
 
       let isCustomerBuildEnabled = isPhoneConnected && "customerBuild" in phoneSettingsData && phoneSettingsData.customerBuild;
 
-      let isOverlayEnableAIEnabled = isPhoneConnected && "overlayEnableAI" in phoneSettingsData && phoneSettingsData.overlayEnableAI;
+      let isEnableAIEnabled = isPhoneConnected && "enableAI" in phoneSettingsData && phoneSettingsData.enableAI;
 
       let isCaptureWideEnabled = isPhoneConnected && "captureWide" in phoneSettingsData && phoneSettingsData.captureWide;
       let isSaveWideEnabled = isPhoneConnected && "saveWide" in phoneSettingsData && phoneSettingsData.saveWide;
@@ -839,9 +839,9 @@
       let phoneSettingsCustomerBuildCheckedWas = phoneSettingsCustomerBuildEl.checked;
       phoneSettingsCustomerBuildEl.checked = isCustomerBuildEnabled;
       
-      phoneSettingsOverlayEnableAIEl.disabled = !(isPhoneConnected);
-      let phoneSettingsOverlayEnableAICheckedWas = phoneSettingsOverlayEnableAIEl.checked;
-      phoneSettingsOverlayEnableAIEl.checked = isOverlayEnableAIEnabled;
+      phoneSettingsEnableAIEl.disabled = !(isPhoneConnected);
+      let phoneSettingsEnableAICheckedWas = phoneSettingsEnableAIEl.checked;
+      phoneSettingsEnableAIEl.checked = isEnableAIEnabled;
       
       phoneSettingsCaptureWideEl.disabled = !(isPhoneConnected);
       let phoneSettingsCaptureWideCheckedWas = phoneSettingsCaptureWideEl.checked;
@@ -895,10 +895,10 @@
       }
 
       if (phoneSettingsGroupAIEl.checked) {
-        if (phoneSettingsOverlayEnableAICheckedWas && !phoneSettingsOverlayEnableAIEl.checked)
+        if (phoneSettingsEnableAICheckedWas && !phoneSettingsEnableAIEl.checked)
           phoneSettingsGroupAIEl.checked = false;
       } else {
-        if (!phoneSettingsOverlayEnableAICheckedWas && phoneSettingsOverlayEnableAIEl.checked)
+        if (!phoneSettingsEnableAICheckedWas && phoneSettingsEnableAIEl.checked)
           phoneSettingsGroupAIEl.checked = true;
       }
 
@@ -963,7 +963,7 @@
       phoneSettingsCustomerBuildLabelEl.style.display = displayValApp;
 
       let displayValAI = phoneSettingsGroupAIEl.checked ? 'inline-block' : 'none';
-      phoneSettingsOverlayEnableAILabelEl.style.display = displayValAI;
+      phoneSettingsEnableAILabelEl.style.display = displayValAI;
 
       let displayValCapture = phoneSettingsGroupCaptureEl.checked ? 'inline-block' : 'none';
       phoneSettingsCaptureWideLabelEl.style.display = displayValCapture;
@@ -1468,7 +1468,7 @@
 
         case phoneSettingsCustomerBuildEl.id: phoneSettingsData.customerBuild = obj.checked; settingsDataSendToPhone(); break;
 
-        case phoneSettingsOverlayEnableAIEl.id: phoneSettingsData.overlayEnableAI = obj.checked; settingsDataSendToPhone(); break;
+        case phoneSettingsEnableAIEl.id: phoneSettingsData.enableAI = obj.checked; settingsDataSendToPhone(); break;
 
         case phoneSettingsCaptureWideEl.id: phoneSettingsData.captureWide = obj.checked; settingsDataSendToPhone(); break;
         case phoneSettingsSaveWideEl.id: phoneSettingsData.saveWide = obj.checked; settingsDataSendToPhone(); break;
